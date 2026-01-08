@@ -16,29 +16,28 @@ export default function BudgetPage() {
   const [profitMargin, setProfitMargin] = useState(20);
   
   const { data: projectDetails, isLoading: isLoadingDetails } = useProject(selectedProjectId ? parseInt(selectedProjectId) : null);
+  const updateProject = useUpdateProject();
   const deleteCalculation = useDeleteCalculation();
   const { toast } = useToast();
 
-  const budgetItems = useMemo(() => {
-    if (!projectDetails?.calculations) return [];
-    
-    return projectDetails.calculations.map((calc: any) => {
-      // Mock pricing logic for demonstration
-      const unitPrice = calc.type === 'slab' ? 450 : 320; // Base price per m2
-      const baseCost = parseFloat(calc.area) * unitPrice;
-      const profit = baseCost * (profitMargin / 100);
-      const total = baseCost + profit;
-      
-      return {
-        ...calc,
-        unitPrice,
-        baseCost,
-        total
-      };
-    });
-  }, [projectDetails, profitMargin]);
+  const totalArea = projectDetails?.calculations?.reduce((acc, curr) => acc + parseFloat(curr.area), 0) || 0;
 
-  const totalBudget = budgetItems.reduce((acc, item) => acc + item.total, 0);
+  const totalMaterialCost = projectDetails?.calculations?.reduce((acc, curr) => {
+    if (curr.type === 'slab') {
+      return acc + (parseFloat(curr.area) * 450); // $450/m2 material
+    } else {
+      return acc + (parseFloat(curr.area) * 380); // $380/m2 material
+    }
+  }, 0) || 0;
+
+  const totalLaborCost = parseFloat(projectDetails?.laborCostPerM2 || "0") * totalArea;
+  const subtotal = totalMaterialCost + totalLaborCost;
+  const profit = subtotal * (parseFloat(projectDetails?.profitMargin || "20") / 100);
+  const total = subtotal + profit;
+
+  const handleUpdateLabor = (value: string) => {
+    updateProject.mutate({ id: parseInt(selectedProjectId), laborCostPerM2: value });
+  };
 
   const handleShareWhatsApp = () => {
     if (!projectDetails) return;
@@ -171,6 +170,20 @@ _Generado automáticamente por Estructura 360_
                 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
+                    <span className="text-sm opacity-70">Costo Mano de Obra (m²)</span>
+                    <span className="font-bold text-accent">${projectDetails?.laborCostPerM2 || 0}</span>
+                  </div>
+                  <Input 
+                    type="number" 
+                    placeholder="Mano de obra p/m2"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    defaultValue={projectDetails?.laborCostPerM2 || ""}
+                    onBlur={(e) => handleUpdateLabor(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
                     <span className="text-sm opacity-70">Margen de Utilidad</span>
                     <span className="font-bold text-accent">{profitMargin}%</span>
                   </div>
@@ -187,7 +200,7 @@ _Generado automáticamente por Estructura 360_
                 <div className="pt-4 mt-4 border-t border-white/10">
                   <span className="block text-sm opacity-70 mb-1">Precio Final</span>
                   <span className="block text-4xl font-display font-bold text-white">
-                    ${totalBudget.toLocaleString('es-MX', { maximumFractionDigits: 0 })}
+                    ${total.toLocaleString('es-MX', { maximumFractionDigits: 0 })}
                   </span>
                   <span className="block text-xs opacity-50 mt-1">Moneda Nacional (MXN)</span>
                 </div>

@@ -9,6 +9,7 @@ import ComparativePage from "@/pages/Comparative";
 import BudgetPage from "@/pages/Budget";
 import TechnicalPage from "@/pages/Technical";
 import AboutPage from "@/pages/About";
+import MarketplacePage from "@/pages/Marketplace";
 
 function Router() {
   return (
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/budget" component={BudgetPage} />
       <Route path="/technical" component={TechnicalPage} />
       <Route path="/about" component={AboutPage} />
+      <Route path="/marketplace" component={MarketplacePage} />
       <Route component={NotFound} />
     </Switch>
   );

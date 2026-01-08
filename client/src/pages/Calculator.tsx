@@ -22,6 +22,7 @@ const slabFormSchema = z.object({
   area: z.coerce.number().min(1, "El área debe ser mayor a 0"),
   beamDepth: z.enum(["P-15", "P-20", "P-25"]),
   density: z.coerce.number().min(10).max(25),
+  climate: z.enum(["Caluroso", "Frío"]),
 });
 
 const wallFormSchema = z.object({
@@ -47,6 +48,7 @@ export default function CalculatorPage() {
       area: 0,
       beamDepth: "P-15",
       density: 12,
+      climate: "Caluroso",
     },
   });
 
@@ -90,7 +92,11 @@ export default function CalculatorPage() {
     // Mock Calculation Logic (Backend normally handles detailed logic, but we send raw values)
     // Here we just simulate some basic result structure to match schema requirements
     const projectId = parseInt(selectedProjectId);
-    const specs = { beamDepth: values.beamDepth, polystyreneDensity: values.density };
+    const specs = { 
+      beamDepth: values.beamDepth, 
+      polystyreneDensity: values.density,
+      climate: values.climate 
+    };
     
     // Simulate savings for display later
     const concreteSaved = values.area * 0.08; // approx 0.08 m3 saved per m2
@@ -279,6 +285,28 @@ export default function CalculatorPage() {
                         </FormItem>
                       )}
                     />
+                  </div>
+
+                  <div className="space-y-4">
+                    <Label>Clima Predominante</Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Button
+                        type="button"
+                        variant={slabForm.watch("climate") === "Caluroso" ? "default" : "outline"}
+                        className="w-full h-12"
+                        onClick={() => slabForm.setValue("climate", "Caluroso")}
+                      >
+                        Caluroso
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={slabForm.watch("climate") === "Frío" ? "default" : "outline"}
+                        className="w-full h-12"
+                        onClick={() => slabForm.setValue("climate", "Frío")}
+                      >
+                        Frío
+                      </Button>
+                    </div>
                   </div>
 
                   <FormField

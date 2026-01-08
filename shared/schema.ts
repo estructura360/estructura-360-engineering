@@ -9,6 +9,7 @@ export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   clientName: text("client_name").notNull(),
   profitMargin: decimal("profit_margin").default("20.0"), // Percentage
+  laborCostPerM2: decimal("labor_cost_per_m2").default("0.0"), // Cost per m2 for labor
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -28,9 +28,14 @@ export default function ComparativePage() {
       weightReduced: acc.weightReduced + weightReducedValue,
       timeSaved: acc.timeSaved + timeSavedValue,
       energySaved: acc.energySaved + energySavedValue,
+      thermalConfort: acc.thermalConfort + parseFloat(res.comparison?.thermalConfort || 0),
       area: acc.area + parseFloat(curr.area),
     };
-  }, { concreteSaved: 0, weightReduced: 0, timeSaved: 0, energySaved: 0, area: 0 }) || { concreteSaved: 0, weightReduced: 0, timeSaved: 0, energySaved: 0, area: 0 };
+  }, { concreteSaved: 0, weightReduced: 0, timeSaved: 0, energySaved: 0, thermalConfort: 0, area: 0 }) || { concreteSaved: 0, weightReduced: 0, timeSaved: 0, energySaved: 0, thermalConfort: 0, area: 0 };
+
+  const averageThermal = projectDetails?.calculations?.length 
+    ? (aggregateData.thermalConfort / projectDetails.calculations.length).toFixed(0)
+    : "0";
 
   const chartData = [
     {
@@ -88,16 +93,16 @@ export default function ComparativePage() {
               icon={Box}
               trend="down"
               trendValue="30%"
-              highlight
             />
             <MetricCard
               title="Reducción de Peso"
               value={(aggregateData.weightReduced / 1000).toFixed(1)}
               unit="Ton"
-              subtitle="Estructura más ligera"
+              subtitle="Carga sísmica reducida"
               icon={Weight}
               trend="down"
               trendValue="45%"
+              highlight
             />
             <MetricCard
               title="Tiempo Ahorrado"
@@ -107,7 +112,6 @@ export default function ComparativePage() {
               icon={Clock}
               trend="down"
               trendValue="50%"
-              highlight
             />
             <MetricCard
               title="Eficiencia Energética"
@@ -171,11 +175,11 @@ export default function ComparativePage() {
                   </p>
                   <div className="p-4 bg-white/5 rounded-xl border border-white/10">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs uppercase tracking-wider font-semibold opacity-70">Aislamiento R-Value</span>
-                      <span className="text-accent font-bold">R-18</span>
+                      <span className="text-xs uppercase tracking-wider font-semibold opacity-70">Confort Térmico Estimado</span>
+                      <span className="text-accent font-bold">{averageThermal}%</span>
                     </div>
                     <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                      <div className="bg-accent h-full w-[85%]" />
+                      <div className="bg-accent h-full transition-all duration-1000" style={{ width: `${averageThermal}%` }} />
                     </div>
                   </div>
                 </div>

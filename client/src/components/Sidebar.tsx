@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Calculator, BarChart3, FileText, BookOpen, Menu, X, Hammer, HardHat, Info } from "lucide-react";
+import { Calculator, BarChart3, FileText, BookOpen, Menu, X, Hammer, HardHat, Info, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 const navigation = [
   { name: "Calculadora", href: "/", icon: Calculator },
   { name: "Comparativa", href: "/comparative", icon: BarChart3 },
+  { name: "Marketplace", href: "/marketplace", icon: ShoppingBag },
   { name: "Presupuesto", href: "/budget", icon: FileText },
   { name: "Info Técnica", href: "/technical", icon: BookOpen },
   { name: "Acerca de", href: "/about", icon: Info },

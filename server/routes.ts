@@ -67,29 +67,32 @@ export async function registerRoutes(
       let results: any = {};
       
       if (input.type === 'slab') {
-        // Parse specs safely
-        // In a real app, use SlabSpecsSchema.parse(input.specs)
         const specs = input.specs as any; 
         const beamDepth = specs.beamDepth || 'P-15';
         const density = specs.polystyreneDensity || 15;
+        const climate = specs.climate || 'Caluroso';
 
         // Constants
-        const beamsPerM2 = 1.2; // linear meters
-        const vaultsPerM2 = 8.5; // pieces
-        const meshPerM2 = 1.1; // m2
+        const beamsPerM2 = 1.2; 
+        const vaultsPerM2 = 8.5; 
+        const meshPerM2 = 1.1; 
 
         // Comparison Baselines (Traditional Slab)
-        const tradConcrete = 0.12 * area; // m3
-        const tradWeight = 300 * area; // kg
-        const tradTime = 14; // days (base)
+        const tradConcrete = 0.12 * area; 
+        const tradWeight = 300 * area; 
+        const tradTime = 14; 
 
         // Vigueta & Bovedilla stats
-        const sysConcrete = 0.05 * area; // m3
-        const sysWeight = 180 * area; // kg
-        const sysTime = 7; // days
+        const sysConcrete = 0.05 * area; 
+        const sysWeight = 180 * area; 
+        const sysTime = 7; 
         
-        // Energy Score (arbitrary logic for MVP: higher density = better score)
         const energyScore = density * 4; 
+        const seismicSaving = tradWeight - sysWeight;
+
+        // Thermal simulation (arbitrary but illustrative logic)
+        // Polystyrene vs concrete-sand vault
+        const thermalConfort = climate === 'Caluroso' ? 85 + (density/5) : 80 + (density/5);
 
         results = {
           materials: {
@@ -100,9 +103,10 @@ export async function registerRoutes(
           },
           comparison: {
             concreteSaved: (tradConcrete - sysConcrete).toFixed(2),
-            weightReduced: (tradWeight - sysWeight).toFixed(0),
+            weightReduced: seismicSaving.toFixed(0),
             timeSaved: tradTime - sysTime,
-            energyEfficiency: energyScore
+            energyEfficiency: energyScore,
+            thermalConfort: thermalConfort.toFixed(0)
           }
         };
 
