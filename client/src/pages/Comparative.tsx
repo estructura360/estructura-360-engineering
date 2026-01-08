@@ -48,6 +48,11 @@ export default function ComparativePage() {
       Tradicional: (aggregateData.area / 10).toFixed(0), // Assume 10m2/day
       Estructura360: ((aggregateData.area / 10) - aggregateData.timeSaved).toFixed(0),
     },
+    {
+      name: "Peso Estructural (Ton)",
+      Tradicional: ((aggregateData.area * 300) / 1000).toFixed(1), // Assume 300kg/m2 for traditional
+      Estructura360: (((aggregateData.area * 300) - aggregateData.weightReduced) / 1000).toFixed(1),
+    },
   ];
 
   return (
