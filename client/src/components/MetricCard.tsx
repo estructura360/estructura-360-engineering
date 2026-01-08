@@ -40,7 +40,7 @@ export function MetricCard({
             {title}
           </p>
           <div className="flex items-baseline gap-1">
-            <h3 className="text-3xl font-bold font-display tracking-tight">
+            <h3 className={cn("text-3xl font-bold font-display tracking-tight", highlight ? "text-white" : "text-foreground")}>
               {value}
             </h3>
             {unit && <span className={cn("text-sm font-medium", highlight ? "text-accent" : "text-muted-foreground")}>{unit}</span>}
