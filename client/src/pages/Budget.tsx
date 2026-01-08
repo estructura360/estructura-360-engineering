@@ -10,14 +10,7 @@ import { Share2, Trash2, FileDown, Loader2, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { api, type Calculation } from "@shared/routes";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
-
-// Add declaration for jspdf-autotable
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: any) => jsPDF;
-  }
-}
+import autoTable from "jspdf-autotable";
 
 export default function BudgetPage() {
   const { data: projects, isLoading: isLoadingProjects } = useProjects();
@@ -91,7 +84,7 @@ export default function BudgetPage() {
       `$${item.total.toLocaleString('es-MX')}`
     ]);
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: 85,
       head: [['Concepto', 'Cantidad', 'Precio Unitario', 'Total']],
       body: tableData,
