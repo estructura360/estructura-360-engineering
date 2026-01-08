@@ -20,20 +20,30 @@ export default function BudgetPage() {
   const deleteCalculation = useDeleteCalculation();
   const { toast } = useToast();
 
+  const budgetItems = useMemo(() => {
+    if (!projectDetails?.calculations) return [];
+    
+    return projectDetails.calculations.map((calc: any) => {
+      const unitPrice = calc.type === 'slab' ? 450 : 320; 
+      const baseCost = parseFloat(calc.area) * unitPrice;
+      const profit = baseCost * (profitMargin / 100);
+      const total = baseCost + profit;
+      
+      return {
+        ...calc,
+        unitPrice,
+        baseCost,
+        total
+      };
+    });
+  }, [projectDetails, profitMargin]);
+
   const totalArea = projectDetails?.calculations?.reduce((acc, curr) => acc + parseFloat(curr.area), 0) || 0;
-
-  const totalMaterialCost = projectDetails?.calculations?.reduce((acc, curr) => {
-    if (curr.type === 'slab') {
-      return acc + (parseFloat(curr.area) * 450); // $450/m2 material
-    } else {
-      return acc + (parseFloat(curr.area) * 380); // $380/m2 material
-    }
-  }, 0) || 0;
-
+  const totalMaterialCost = budgetItems.reduce((acc, item) => acc + item.baseCost, 0);
   const totalLaborCost = parseFloat(projectDetails?.laborCostPerM2 || "0") * totalArea;
   const subtotal = totalMaterialCost + totalLaborCost;
-  const profit = subtotal * (parseFloat(projectDetails?.profitMargin || "20") / 100);
-  const total = subtotal + profit;
+  const currentProfit = subtotal * (profitMargin / 100);
+  const totalBudget = subtotal + currentProfit;
 
   const handleUpdateLabor = (value: string) => {
     updateProject.mutate({ id: parseInt(selectedProjectId), laborCostPerM2: value });
@@ -60,9 +70,7 @@ _Generado automáticamente por Estructura 360_
     if (!selectedProjectId) return;
     try {
       await deleteCalculation.mutateAsync({ id, projectId: parseInt(selectedProjectId) });
-    } catch (e) {
-      // handled in hook
-    }
+    } catch (e) {}
   };
 
   return (
@@ -164,7 +172,7 @@ _Generado automáticamente por Estructura 360_
                 <div className="flex justify-between items-end border-b border-white/10 pb-4">
                   <span className="text-sm opacity-70">Subtotal Costo</span>
                   <span className="text-xl font-medium">
-                    ${(totalBudget / (1 + profitMargin/100)).toLocaleString('es-MX', { maximumFractionDigits: 0 })}
+                    ${subtotal.toLocaleString('es-MX', { maximumFractionDigits: 0 })}
                   </span>
                 </div>
                 
@@ -200,7 +208,7 @@ _Generado automáticamente por Estructura 360_
                 <div className="pt-4 mt-4 border-t border-white/10">
                   <span className="block text-sm opacity-70 mb-1">Precio Final</span>
                   <span className="block text-4xl font-display font-bold text-white">
-                    ${total.toLocaleString('es-MX', { maximumFractionDigits: 0 })}
+                    ${totalBudget.toLocaleString('es-MX', { maximumFractionDigits: 0 })}
                   </span>
                   <span className="block text-xs opacity-50 mt-1">Moneda Nacional (MXN)</span>
                 </div>
