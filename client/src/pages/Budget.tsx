@@ -90,9 +90,12 @@ export default function BudgetPage() {
       body: tableData,
       headStyles: { fillColor: [15, 23, 42] },
       alternateRowStyles: { fillColor: [245, 247, 250] },
+      didDrawPage: (data) => {
+        (doc as any).lastTableFinalY = data.cursor?.y;
+      }
     });
 
-    const finalY = (doc as any).lastAutoTable.cursor.y + 15;
+    const finalY = (doc as any).lastTableFinalY || 150;
 
     // Summary
     doc.setFontSize(12);
