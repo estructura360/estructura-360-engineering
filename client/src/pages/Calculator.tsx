@@ -129,10 +129,11 @@ export default function CalculatorPage() {
           mesh: Math.ceil(area * 1.1)
         },
         comparison: {
-          concreteSaved,
-          weightReduced,
+          concreteSaved: concreteSaved.toFixed(2),
+          weightReduced: weightReduced.toString(),
           timeSaved: Math.ceil(area / 20),
-          energySaved: area * 15,
+          energyEfficiency: Math.round(values.density * 4),
+          thermalConfort: values.climate === 'Frío' ? 85 : values.climate === 'Templado' ? 75 : 88
         },
         layout: {
           orientation: layout.orientation,
@@ -167,10 +168,9 @@ export default function CalculatorPage() {
       results: {
         materials: { panels: Math.ceil(area / 2.97) },
         comparison: {
-          concreteSaved: area * 0.05,
-          weightReduced: area * 80,
           timeSaved: Math.ceil(area / 15),
-          energySaved: area * 25,
+          weightReduced: (area * 80).toString(),
+          energyEfficiency: 85
         }
       }
     });
