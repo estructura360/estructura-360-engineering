@@ -11,6 +11,9 @@ import TechnicalPage from "@/pages/Technical";
 import AboutPage from "@/pages/About";
 import MarketplacePage from "@/pages/Marketplace";
 
+import SchedulePage from "@/pages/Schedule";
+import LogbookPage from "@/pages/Logbook";
+
 function Router() {
   return (
     <Switch>
@@ -20,6 +23,8 @@ function Router() {
       <Route path="/technical" component={TechnicalPage} />
       <Route path="/about" component={AboutPage} />
       <Route path="/marketplace" component={MarketplacePage} />
+      <Route path="/schedule" component={SchedulePage} />
+      <Route path="/logbook" component={LogbookPage} />
       <Route component={NotFound} />
     </Switch>
   );

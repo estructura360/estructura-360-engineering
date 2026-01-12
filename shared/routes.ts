@@ -50,6 +50,40 @@ export const api = {
       },
     }
   },
+  schedule: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/projects/:projectId/tasks',
+      responses: {
+        200: z.array(z.any()),
+      },
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/projects/:projectId/tasks',
+      input: z.any(),
+      responses: {
+        201: z.any(),
+      },
+    },
+  },
+  logs: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/projects/:projectId/logs',
+      responses: {
+        200: z.array(z.any()),
+      },
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/projects/:projectId/logs',
+      input: z.any(),
+      responses: {
+        201: z.any(),
+      },
+    },
+  },
   calculations: {
     create: {
       method: 'POST' as const,
