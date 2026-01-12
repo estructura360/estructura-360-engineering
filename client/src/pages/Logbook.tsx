@@ -1,27 +1,29 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { useProjects } from "@/hooks/use-projects";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Camera, MapPin, Clock, Plus, Loader2, Image } from "lucide-react";
+import { Camera, MapPin, Clock, Plus, Loader2, Image, WifiOff, CloudOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { useOfflineStatus } from "@/hooks/use-offline";
+import { saveOfflineLog, getOfflineLogs, addToSyncQueue } from "@/lib/offlineStorage";
 
 interface LogEntry {
-  id: number;
+  id: number | string;
   projectId: number;
   notes: string | null;
   photoUrl: string | null;
   latitude: string | null;
   longitude: string | null;
   timestamp: string;
+  isOffline?: boolean;
 }
 
 export default function LogbookPage() {
@@ -32,43 +34,152 @@ export default function LogbookPage() {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [offlineLogs, setOfflineLogs] = useState<LogEntry[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { isOffline, pendingCount } = useOfflineStatus();
 
-  const { data: logs, isLoading: isLoadingLogs } = useQuery<LogEntry[]>({
+  const { data: serverLogs, isLoading: isLoadingLogs } = useQuery<LogEntry[]>({
     queryKey: ['/api/projects', selectedProjectId, 'logs'],
-    enabled: !!selectedProjectId,
+    enabled: !!selectedProjectId && !isOffline,
   });
+
+  // Load offline logs when project changes
+  useEffect(() => {
+    async function loadOfflineLogs() {
+      if (selectedProjectId) {
+        try {
+          const offline = await getOfflineLogs(parseInt(selectedProjectId));
+          setOfflineLogs(offline.map(log => ({ ...log, isOffline: !log.synced })));
+        } catch (e) {
+          console.error('Error loading offline logs:', e);
+        }
+      }
+    }
+    loadOfflineLogs();
+  }, [selectedProjectId]);
+
+  // Combine server and offline logs
+  const logs = [...(serverLogs || []), ...offlineLogs.filter(l => l.isOffline)].sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  );
 
   const createLog = useMutation({
     mutationFn: async () => {
-      return apiRequest(`/api/projects/${selectedProjectId}/logs`, {
-        method: 'POST',
-        body: JSON.stringify({
-          projectId: parseInt(selectedProjectId),
-          notes,
-          photoUrl: photoPreview,
-          latitude: location?.lat.toString(),
-          longitude: location?.lng.toString(),
-        }),
-      });
+      const logData = {
+        projectId: parseInt(selectedProjectId),
+        notes,
+        photoUrl: photoPreview,
+        latitude: location?.lat.toString() || null,
+        longitude: location?.lng.toString() || null,
+        timestamp: new Date().toISOString(),
+      };
+
+      if (isOffline) {
+        // Save locally when offline
+        const offlineLog = await saveOfflineLog(logData);
+        
+        // Add to sync queue for later
+        await addToSyncQueue({
+          type: 'log',
+          action: 'create',
+          endpoint: `/api/projects/${selectedProjectId}/logs`,
+          data: logData
+        });
+        
+        return offlineLog;
+      } else {
+        // Online - save directly to server
+        return apiRequest(`/api/projects/${selectedProjectId}/logs`, {
+          method: 'POST',
+          body: JSON.stringify(logData),
+        });
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/projects', selectedProjectId, 'logs'] });
+    onSuccess: async (result) => {
+      if (isOffline) {
+        // Update local state for offline logs
+        const offline = await getOfflineLogs(parseInt(selectedProjectId));
+        setOfflineLogs(offline.map(log => ({ ...log, isOffline: !log.synced })));
+        toast({ 
+          title: "Guardado localmente", 
+          description: "Se sincronizará automáticamente cuando haya conexión.",
+        });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['/api/projects', selectedProjectId, 'logs'] });
+        toast({ title: "Registro guardado", description: "La entrada de bitácora se guardó correctamente." });
+      }
+      
       setNotes("");
       setPhotoPreview(null);
       setLocation(null);
       setDialogOpen(false);
-      toast({ title: "Registro guardado", description: "La entrada de bitácora se guardó correctamente." });
     },
+    onError: async () => {
+      // If online request fails, save offline
+      const logData = {
+        projectId: parseInt(selectedProjectId),
+        notes,
+        photoUrl: photoPreview,
+        latitude: location?.lat.toString() || null,
+        longitude: location?.lng.toString() || null,
+        timestamp: new Date().toISOString(),
+      };
+      
+      await saveOfflineLog(logData);
+      await addToSyncQueue({
+        type: 'log',
+        action: 'create',
+        endpoint: `/api/projects/${selectedProjectId}/logs`,
+        data: logData
+      });
+      
+      const offline = await getOfflineLogs(parseInt(selectedProjectId));
+      setOfflineLogs(offline.map(log => ({ ...log, isOffline: !log.synced })));
+      
+      setNotes("");
+      setPhotoPreview(null);
+      setLocation(null);
+      setDialogOpen(false);
+      
+      toast({ 
+        title: "Guardado localmente", 
+        description: "No se pudo conectar. Se sincronizará cuando haya conexión.",
+      });
+    }
   });
 
   const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Compress image for offline storage
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPhotoPreview(reader.result as string);
+        const img = document.createElement('img');
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxSize = 800; // Max dimension
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > height && width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          } else if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Compress to JPEG at 70% quality
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          setPhotoPreview(compressed);
+        };
+        img.src = reader.result as string;
       };
       reader.readAsDataURL(file);
     }
@@ -99,7 +210,15 @@ export default function LogbookPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
           <h1 className="text-3xl font-display font-bold text-primary">Bitácora Fotográfica</h1>
-          <p className="text-muted-foreground mt-2">Registra el avance diario con fotos geo-etiquetadas.</p>
+          <p className="text-muted-foreground mt-2">
+            Registra el avance diario con fotos geo-etiquetadas.
+            {isOffline && (
+              <span className="ml-2 inline-flex items-center gap-1 text-amber-600">
+                <WifiOff className="h-4 w-4" />
+                Modo sin conexión
+              </span>
+            )}
+          </p>
         </div>
         <div className="flex gap-3">
           <Select value={selectedProjectId} onValueChange={setSelectedProjectId} disabled={isLoadingProjects}>
@@ -125,10 +244,16 @@ export default function LogbookPage() {
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Nuevo Registro de Bitácora</DialogTitle>
+                  <DialogTitle className="flex items-center gap-2">
+                    Nuevo Registro de Bitácora
+                    {isOffline && (
+                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-normal">
+                        Sin conexión
+                      </span>
+                    )}
+                  </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 pt-4">
-                  {/* Photo capture */}
                   <div 
                     className="border-2 border-dashed border-muted-foreground/30 rounded-xl p-6 text-center cursor-pointer hover:border-accent/50 transition-colors"
                     onClick={() => fileInputRef.current?.click()}
@@ -151,7 +276,6 @@ export default function LogbookPage() {
                     />
                   </div>
 
-                  {/* Location button */}
                   <Button
                     variant="outline"
                     className="w-full"
@@ -166,7 +290,6 @@ export default function LogbookPage() {
                     {location ? `Ubicación: ${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : "Obtener Ubicación GPS"}
                   </Button>
 
-                  {/* Notes */}
                   <Textarea
                     placeholder="Notas del avance (opcional)..."
                     value={notes}
@@ -180,7 +303,7 @@ export default function LogbookPage() {
                     disabled={!photoPreview || createLog.isPending}
                   >
                     {createLog.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Guardar en Bitácora
+                    {isOffline ? "Guardar Localmente" : "Guardar en Bitácora"}
                   </Button>
                 </div>
               </DialogContent>
@@ -194,7 +317,7 @@ export default function LogbookPage() {
           <Camera className="h-16 w-16 text-muted-foreground/30 mb-4" />
           <p className="text-lg text-muted-foreground font-medium">Selecciona un proyecto para ver la bitácora</p>
         </div>
-      ) : isLoadingLogs ? (
+      ) : isLoadingLogs && !isOffline ? (
         <div className="flex items-center justify-center h-[400px]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -207,10 +330,16 @@ export default function LogbookPage() {
             </div>
           ) : (
             logs?.map((log) => (
-              <Card key={log.id} className="overflow-hidden shadow-lg border-0 hover:shadow-xl transition-shadow">
+              <Card key={log.id} className={`overflow-hidden shadow-lg border-0 hover:shadow-xl transition-shadow ${log.isOffline ? 'ring-2 ring-amber-400' : ''}`}>
                 {log.photoUrl && (
-                  <div className="aspect-video bg-muted">
+                  <div className="aspect-video bg-muted relative">
                     <img src={log.photoUrl} alt="Avance" className="w-full h-full object-cover" />
+                    {log.isOffline && (
+                      <div className="absolute top-2 right-2 bg-amber-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                        <CloudOff className="h-3 w-3" />
+                        Pendiente
+                      </div>
+                    )}
                   </div>
                 )}
                 <CardContent className="p-4 space-y-3">
