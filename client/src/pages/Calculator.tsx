@@ -12,14 +12,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useProjects, useCreateProject, useAddCalculation } from "@/hooks/use-projects";
-import { SlabSpecsSchema, WallSpecsSchema } from "@shared/schema";
-import { Plus, Save, ArrowRight, Loader2, Layers, BrickWall } from "lucide-react";
+import { Plus, Save, Loader2, Layers, BrickWall, FileImage } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { calculateLayout, LayoutResult } from "@/lib/layoutPlanner";
+import { SlabLayoutDiagram } from "@/components/SlabLayoutDiagram";
 
-// Form Schemas
 const slabFormSchema = z.object({
-  area: z.coerce.number().min(1, "El área debe ser mayor a 0"),
+  length: z.coerce.number().min(1, "El largo debe ser mayor a 0"),
+  width: z.coerce.number().min(1, "El ancho debe ser mayor a 0"),
   beamDepth: z.enum(["P-15", "P-20", "P-25"]),
   density: z.coerce.number().min(10).max(25),
   climate: z.enum(["Caluroso", "Frío"]),
@@ -40,19 +41,20 @@ export default function CalculatorPage() {
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
   const [newProjectName, setNewProjectName] = useState("");
   const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false);
+  const [layoutResult, setLayoutResult] = useState<LayoutResult | null>(null);
+  const [layoutDimensions, setLayoutDimensions] = useState<{ length: number; width: number } | null>(null);
 
-  // Slab Form
   const slabForm = useForm<z.infer<typeof slabFormSchema>>({
     resolver: zodResolver(slabFormSchema),
     defaultValues: {
-      area: 0,
+      length: 0,
+      width: 0,
       beamDepth: "P-15",
       density: 12,
       climate: "Caluroso",
     },
   });
 
-  // Wall Form
   const wallForm = useForm<z.infer<typeof wallFormSchema>>({
     resolver: zodResolver(wallFormSchema),
     defaultValues: {
@@ -62,10 +64,8 @@ export default function CalculatorPage() {
     },
   });
 
-  // Auto-select latest project if created
   useEffect(() => {
     if (projects && projects.length > 0 && !selectedProjectId) {
-      // Typically sort by ID desc or created_at desc
       const sorted = [...projects].sort((a, b) => b.id - a.id);
       setSelectedProjectId(sorted[0].id.toString());
     }
@@ -83,42 +83,70 @@ export default function CalculatorPage() {
     }
   };
 
+  const generateLayout = () => {
+    const length = slabForm.getValues("length");
+    const width = slabForm.getValues("width");
+    
+    if (length > 0 && width > 0) {
+      const result = calculateLayout(length, width);
+      setLayoutResult(result);
+      setLayoutDimensions({ length, width });
+      toast({ title: "Plano generado", description: "Se calculó la distribución óptima de viguetas y bovedillas." });
+    } else {
+      toast({ title: "Medidas requeridas", description: "Ingresa largo y ancho para generar el plano.", variant: "destructive" });
+    }
+  };
+
   const onSlabSubmit = async (values: z.infer<typeof slabFormSchema>) => {
     if (!selectedProjectId) {
       toast({ title: "Proyecto requerido", description: "Por favor selecciona o crea un proyecto primero.", variant: "destructive" });
       return;
     }
 
-    // Mock Calculation Logic (Backend normally handles detailed logic, but we send raw values)
-    // Here we just simulate some basic result structure to match schema requirements
+    const area = values.length * values.width;
     const projectId = parseInt(selectedProjectId);
+    const layout = calculateLayout(values.length, values.width);
+    
     const specs = { 
       beamDepth: values.beamDepth, 
       polystyreneDensity: values.density,
-      climate: values.climate 
+      climate: values.climate,
+      dimensions: { length: values.length, width: values.width }
     };
     
-    // Simulate savings for display later
-    const concreteSaved = values.area * 0.08; // approx 0.08 m3 saved per m2
-    const weightReduced = values.area * 120; // approx 120kg saved per m2
+    const concreteSaved = area * 0.08;
+    const weightReduced = area * 120;
     
     await addCalculation.mutateAsync({
       projectId,
       type: "slab",
-      area: values.area.toString(),
+      area: area.toString(),
       specs,
       results: {
-        materials: { beams: Math.ceil(values.area / 0.7), vaults: Math.ceil(values.area * 6) },
+        materials: { 
+          beams: layout.joistCount, 
+          vaults: layout.totalVaults,
+          mesh: Math.ceil(area * 1.1)
+        },
         comparison: {
           concreteSaved,
           weightReduced,
-          timeSaved: Math.ceil(values.area / 20), // 1 day saved per 20m2
-          energySaved: values.area * 15, // arbitrary unit
+          timeSaved: Math.ceil(area / 20),
+          energySaved: area * 15,
+        },
+        layout: {
+          orientation: layout.orientation,
+          joistLength: layout.joistLength,
+          selectedBeamLength: layout.selectedBeamLength,
+          wastePercentage: layout.wastePercentage,
+          recommendations: layout.recommendations
         }
       }
     });
     
-    slabForm.reset({ ...values, area: 0 }); // Reset area only for next input
+    setLayoutResult(layout);
+    setLayoutDimensions({ length: values.length, width: values.width });
+    toast({ title: "Cálculo guardado", description: "El cálculo se agregó al proyecto con el plano de distribución." });
   };
 
   const onWallSubmit = async (values: z.infer<typeof wallFormSchema>) => {
@@ -137,7 +165,7 @@ export default function CalculatorPage() {
       area: area.toString(),
       specs,
       results: {
-        materials: { panels: Math.ceil(area / 2.97) }, // panel is usually 1.22x2.44 ~ 2.97m2
+        materials: { panels: Math.ceil(area / 2.97) },
         comparison: {
           concreteSaved: area * 0.05,
           weightReduced: area * 80,
@@ -155,7 +183,7 @@ export default function CalculatorPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
           <h1 className="text-3xl font-display font-bold text-primary">Calculadora de Materiales</h1>
-          <p className="text-muted-foreground mt-2">Configura los parámetros técnicos para losa y muro.</p>
+          <p className="text-muted-foreground mt-2">Configura los parámetros técnicos y genera planos automáticos.</p>
         </div>
 
         <Card className="min-w-[300px] border-l-4 border-l-accent shadow-md">
@@ -224,18 +252,80 @@ export default function CalculatorPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="slab">
+        <TabsContent value="slab" className="space-y-6">
           <Card className="border-0 shadow-xl shadow-primary/5 overflow-hidden">
             <div className="h-2 bg-gradient-to-r from-primary to-accent w-full" />
             <CardHeader className="bg-muted/10 pb-8">
               <CardTitle className="text-2xl">Configuración de Losa</CardTitle>
               <CardDescription>
-                Calcula viguetas, bovedillas y malla electrosoldada según la superficie.
+                Ingresa las dimensiones para generar el plano de distribución automático.
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-8">
               <Form {...slabForm}>
                 <form onSubmit={slabForm.handleSubmit(onSlabSubmit)} className="space-y-8">
+                  {/* Dimensions - NEW */}
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <FormField
+                      control={slabForm.control}
+                      name="length"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Largo de la Losa (m)</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input 
+                                type="number" 
+                                step="0.01"
+                                placeholder="0.00" 
+                                {...field} 
+                                className="pl-4 h-14 text-lg font-medium"
+                                data-testid="input-slab-length"
+                              />
+                              <div className="absolute right-4 top-4 text-muted-foreground font-medium">m</div>
+                            </div>
+                          </FormControl>
+                          <FormDescription>Dimensión en la que correrán las viguetas</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={slabForm.control}
+                      name="width"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Ancho de la Losa (m)</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input 
+                                type="number" 
+                                step="0.01"
+                                placeholder="0.00" 
+                                {...field} 
+                                className="pl-4 h-14 text-lg font-medium"
+                                data-testid="input-slab-width"
+                              />
+                              <div className="absolute right-4 top-4 text-muted-foreground font-medium">m</div>
+                            </div>
+                          </FormControl>
+                          <FormDescription>Dimensión perpendicular a las viguetas</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Area display */}
+                  {slabForm.watch("length") > 0 && slabForm.watch("width") > 0 && (
+                    <div className="bg-accent/10 rounded-xl p-4 flex items-center justify-between">
+                      <span className="text-sm font-medium text-muted-foreground">Área Total:</span>
+                      <span className="text-2xl font-bold text-accent">
+                        {(slabForm.watch("length") * slabForm.watch("width")).toFixed(2)} m²
+                      </span>
+                    </div>
+                  )}
+
                   <div className="grid md:grid-cols-2 gap-8">
                     <FormField
                       control={slabForm.control}
@@ -245,7 +335,7 @@ export default function CalculatorPage() {
                           <FormLabel>Peralte de Vigueta</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger className="h-12">
+                              <SelectTrigger className="h-12" data-testid="select-beam-depth">
                                 <SelectValue placeholder="Seleccionar peralte" />
                               </SelectTrigger>
                             </FormControl>
@@ -275,6 +365,7 @@ export default function CalculatorPage() {
                               defaultValue={[field.value]}
                               onValueChange={(vals) => field.onChange(vals[0])}
                               className="py-4"
+                              data-testid="slider-density"
                             />
                           </div>
                           <FormDescription className="flex justify-between text-xs">
@@ -295,6 +386,7 @@ export default function CalculatorPage() {
                         variant={slabForm.watch("climate") === "Caluroso" ? "default" : "outline"}
                         className="w-full h-12"
                         onClick={() => slabForm.setValue("climate", "Caluroso")}
+                        data-testid="button-climate-hot"
                       >
                         Caluroso
                       </Button>
@@ -303,40 +395,31 @@ export default function CalculatorPage() {
                         variant={slabForm.watch("climate") === "Frío" ? "default" : "outline"}
                         className="w-full h-12"
                         onClick={() => slabForm.setValue("climate", "Frío")}
+                        data-testid="button-climate-cold"
                       >
                         Frío
                       </Button>
                     </div>
                   </div>
 
-                  <FormField
-                    control={slabForm.control}
-                    name="area"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Superficie Total (m²)</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Input 
-                              type="number" 
-                              placeholder="0.00" 
-                              {...field} 
-                              className="pl-4 h-14 text-lg font-medium"
-                            />
-                            <div className="absolute right-4 top-4 text-muted-foreground font-medium">m²</div>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="flex justify-end pt-4">
+                  <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+                    <Button 
+                      type="button"
+                      variant="outline"
+                      size="lg"
+                      className="px-6 rounded-xl"
+                      onClick={generateLayout}
+                      data-testid="button-generate-layout"
+                    >
+                      <FileImage className="mr-2 h-5 w-5" />
+                      Generar Plano
+                    </Button>
                     <Button 
                       type="submit" 
                       size="lg" 
                       className="bg-accent hover:bg-accent/90 text-white px-8 rounded-xl shadow-lg shadow-accent/25 hover:shadow-xl hover:-translate-y-0.5 transition-all"
                       disabled={addCalculation.isPending}
+                      data-testid="button-save-slab"
                     >
                       {addCalculation.isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-5 w-5" />}
                       Guardar Cálculo
@@ -346,6 +429,15 @@ export default function CalculatorPage() {
               </Form>
             </CardContent>
           </Card>
+
+          {/* Layout Diagram */}
+          {layoutResult && layoutDimensions && (
+            <SlabLayoutDiagram 
+              layout={layoutResult} 
+              length={layoutDimensions.length} 
+              width={layoutDimensions.width} 
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="wall">
@@ -368,7 +460,7 @@ export default function CalculatorPage() {
                         <FormLabel>Tipo de Aplicación</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="h-12">
+                            <SelectTrigger className="h-12" data-testid="select-wall-type">
                               <SelectValue placeholder="Seleccionar tipo" />
                             </SelectTrigger>
                           </FormControl>
@@ -393,7 +485,7 @@ export default function CalculatorPage() {
                           <FormLabel>Longitud Lineal (m)</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Input type="number" placeholder="0.00" {...field} className="h-14 text-lg" />
+                              <Input type="number" placeholder="0.00" {...field} className="h-14 text-lg" data-testid="input-wall-length" />
                               <div className="absolute right-4 top-4 text-muted-foreground font-medium">m</div>
                             </div>
                           </FormControl>
@@ -409,7 +501,7 @@ export default function CalculatorPage() {
                           <FormLabel>Altura Promedio (m)</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Input type="number" placeholder="0.00" {...field} className="h-14 text-lg" />
+                              <Input type="number" placeholder="0.00" {...field} className="h-14 text-lg" data-testid="input-wall-height" />
                               <div className="absolute right-4 top-4 text-muted-foreground font-medium">m</div>
                             </div>
                           </FormControl>
@@ -425,6 +517,7 @@ export default function CalculatorPage() {
                       size="lg" 
                       className="bg-accent hover:bg-accent/90 text-white px-8 rounded-xl shadow-lg shadow-accent/25 hover:shadow-xl hover:-translate-y-0.5 transition-all"
                       disabled={addCalculation.isPending}
+                      data-testid="button-save-wall"
                     >
                       {addCalculation.isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-5 w-5" />}
                       Guardar Cálculo
