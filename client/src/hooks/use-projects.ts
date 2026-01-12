@@ -124,13 +124,41 @@ export function useDeleteCalculation() {
       const url = buildUrl(api.calculations.delete.path, { id });
       const res = await fetch(url, { method: api.calculations.delete.method });
       if (!res.ok) throw new Error("Failed to delete calculation");
-      return projectId; // Return projectId to invalidate correct query
+      return projectId;
     },
     onSuccess: (projectId) => {
       queryClient.invalidateQueries({ queryKey: [api.projects.get.path, projectId] });
       toast({
         title: "Eliminado",
         description: "El cálculo ha sido removido del proyecto.",
+      });
+    },
+  });
+}
+
+export function useDeleteProject() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const url = buildUrl(api.projects.delete.path, { id });
+      const res = await fetch(url, { method: api.projects.delete.method });
+      if (!res.ok) throw new Error("Failed to delete project");
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.projects.list.path] });
+      toast({
+        title: "Proyecto eliminado",
+        description: "El proyecto y todos sus datos han sido eliminados.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el proyecto.",
+        variant: "destructive",
       });
     },
   });

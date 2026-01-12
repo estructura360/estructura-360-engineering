@@ -52,6 +52,14 @@ export const api = {
         200: z.custom<typeof projects.$inferSelect>(),
         404: errorSchemas.notFound,
       },
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/projects/:id',
+      responses: {
+        204: z.undefined(),
+        404: errorSchemas.notFound,
+      },
     }
   },
   schedule: {

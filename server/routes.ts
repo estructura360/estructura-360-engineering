@@ -57,6 +57,15 @@ export async function registerRoutes(
     }
   });
 
+  app.delete(api.projects.delete.path, async (req, res) => {
+    const project = await storage.getProject(Number(req.params.id));
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+    await storage.deleteProject(Number(req.params.id));
+    res.status(204).send();
+  });
+
   // Calculations
   app.post(api.calculations.create.path, async (req, res) => {
     try {

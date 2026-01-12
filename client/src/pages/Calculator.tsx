@@ -11,8 +11,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useProjects, useCreateProject, useAddCalculation } from "@/hooks/use-projects";
-import { Plus, Save, Loader2, Layers, BrickWall, FileImage } from "lucide-react";
+import { useProjects, useCreateProject, useAddCalculation, useDeleteProject } from "@/hooks/use-projects";
+import { Plus, Save, Loader2, Layers, BrickWall, FileImage, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { calculateLayout, LayoutResult } from "@/lib/layoutPlanner";
@@ -36,6 +37,7 @@ export default function CalculatorPage() {
   const { data: projects, isLoading: isLoadingProjects } = useProjects();
   const createProject = useCreateProject();
   const addCalculation = useAddCalculation();
+  const deleteProject = useDeleteProject();
   const { toast } = useToast();
 
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
@@ -133,7 +135,7 @@ export default function CalculatorPage() {
           weightReduced: weightReduced.toString(),
           timeSaved: Math.ceil(area / 20),
           energyEfficiency: Math.round(values.density * 4),
-          thermalConfort: values.climate === 'Frío' ? 85 : values.climate === 'Templado' ? 75 : 88
+          thermalConfort: values.climate === 'Frío' ? 85 : 88
         },
         layout: {
           orientation: layout.orientation,
@@ -230,6 +232,36 @@ export default function CalculatorPage() {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
+                
+                {selectedProjectId && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="icon" variant="ghost" className="shrink-0 text-destructive/70 hover:text-destructive hover:bg-destructive/10" data-testid="button-delete-project">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Eliminar Proyecto</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Esta acción eliminará permanentemente el proyecto y todos sus cálculos, tareas y registros. Esta acción no se puede deshacer.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction 
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          onClick={() => {
+                            deleteProject.mutate(parseInt(selectedProjectId));
+                            setSelectedProjectId("");
+                          }}
+                        >
+                          Eliminar
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
               </div>
             </div>
           </CardContent>

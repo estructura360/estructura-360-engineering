@@ -21,6 +21,7 @@ export interface IStorage {
   getProject(id: number): Promise<Project | undefined>;
   getProjects(): Promise<Project[]>;
   updateProject(id: number, project: Partial<InsertProject>): Promise<Project>;
+  deleteProject(id: number): Promise<void>;
 
   // Calculations
   createCalculation(calculation: InsertCalculation): Promise<Calculation>;
@@ -61,6 +62,13 @@ export class DatabaseStorage implements IStorage {
       .where(eq(projects.id, id))
       .returning();
     return updated;
+  }
+
+  async deleteProject(id: number): Promise<void> {
+    await db.delete(calculations).where(eq(calculations.projectId, id));
+    await db.delete(scheduleTasks).where(eq(scheduleTasks.projectId, id));
+    await db.delete(constructionLogs).where(eq(constructionLogs.projectId, id));
+    await db.delete(projects).where(eq(projects.id, id));
   }
 
   // Calculations
