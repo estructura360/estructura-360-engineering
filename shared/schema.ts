@@ -13,38 +13,58 @@ export const projects = pgTable("projects", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const calculations = pgTable("calculations", {
+export const scheduleTasks = pgTable("schedule_tasks", {
   id: serial("id").primaryKey(),
   projectId: integer("project_id").notNull(),
-  type: text("type").notNull(), // 'slab' | 'wall'
-  area: decimal("area").notNull(), // m2 or linear meters
-  
-  // Specific inputs
-  // Slab: beamDepth (P-15, P-20, P-25), polystyreneDensity (10-25)
-  // Wall: usage (load-bearing, partition, etc)
-  specs: jsonb("specs").notNull(),
-  
-  // Calculated results
-  // materials: { beams: number, vaults: number, ... }
-  // comparison: { concreteSaved: number, weightReduced: number, timeSaved: number, energySaved: number }
-  results: jsonb("results").notNull(),
+  title: text("title").notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  dependencies: integer("dependencies").array(), // IDs of tasks this depends on
+  status: text("status").default("pending"), // 'pending' | 'in_progress' | 'completed'
+});
+
+export const constructionLogs = pgTable("construction_logs", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull(),
+  notes: text("notes"),
+  photoUrl: text("photo_url"),
+  latitude: decimal("latitude"),
+  longitude: decimal("longitude"),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+export const calculations = pgTable("calculations", {
+// ... existing code ...
 });
 
 // === RELATIONS ===
 export const projectsRelations = relations(projects, ({ many }) => ({
   calculations: many(calculations),
+  tasks: many(scheduleTasks),
+  logs: many(constructionLogs),
 }));
 
-export const calculationsRelations = relations(calculations, ({ one }) => ({
+export const scheduleTasksRelations = relations(scheduleTasks, ({ one }) => ({
   project: one(projects, {
-    fields: [calculations.projectId],
+    fields: [scheduleTasks.projectId],
     references: [projects.id],
   }),
 }));
 
+export const constructionLogsRelations = relations(constructionLogs, ({ one }) => ({
+  project: one(projects, {
+    fields: [constructionLogs.projectId],
+    references: [projects.id],
+  }),
+}));
+
+// ... existing code ...
+
 // === BASE SCHEMAS ===
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
 export const insertCalculationSchema = createInsertSchema(calculations).omit({ id: true });
+export const insertTaskSchema = createInsertSchema(scheduleTasks).omit({ id: true });
+export const insertLogSchema = createInsertSchema(constructionLogs).omit({ id: true, timestamp: true });
 
 // === EXPLICIT API CONTRACT TYPES ===
 
@@ -52,6 +72,10 @@ export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type Calculation = typeof calculations.$inferSelect;
 export type InsertCalculation = z.infer<typeof insertCalculationSchema>;
+export type ScheduleTask = typeof scheduleTasks.$inferSelect;
+export type InsertTask = z.infer<typeof insertTaskSchema>;
+export type ConstructionLog = typeof constructionLogs.$inferSelect;
+export type InsertLog = z.infer<typeof insertLogSchema>;
 
 // Inputs
 export type CreateProjectRequest = InsertProject;
