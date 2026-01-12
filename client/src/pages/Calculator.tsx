@@ -348,13 +348,52 @@ export default function CalculatorPage() {
                     />
                   </div>
 
-                  {/* Area display */}
+                  {/* Dynamic Savings Preview */}
                   {slabForm.watch("length") > 0 && slabForm.watch("width") > 0 && (
-                    <div className="bg-accent/10 rounded-xl p-4 flex items-center justify-between">
-                      <span className="text-sm font-medium text-muted-foreground">Área Total:</span>
-                      <span className="text-2xl font-bold text-accent">
-                        {(slabForm.watch("length") * slabForm.watch("width")).toFixed(2)} m²
-                      </span>
+                    <div className="bg-gradient-to-br from-primary/5 via-accent/5 to-green-500/5 rounded-2xl p-6 border border-primary/10 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-muted-foreground">Área Total:</span>
+                        <span className="text-2xl font-bold text-accent">
+                          {(slabForm.watch("length") * slabForm.watch("width")).toFixed(2)} m²
+                        </span>
+                      </div>
+                      
+                      <div className="h-px bg-border" />
+                      
+                      <div className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                        Estimación de Ahorro vs. Losa Tradicional
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="text-center p-3 bg-white/80 rounded-xl border border-green-200">
+                          <div className="text-lg font-bold text-green-600">
+                            -{((slabForm.watch("length") * slabForm.watch("width")) * 0.07).toFixed(1)}m³
+                          </div>
+                          <div className="text-xs text-muted-foreground">Concreto</div>
+                        </div>
+                        <div className="text-center p-3 bg-white/80 rounded-xl border border-blue-200">
+                          <div className="text-lg font-bold text-blue-600">
+                            -{((slabForm.watch("length") * slabForm.watch("width")) * 120 / 1000).toFixed(1)}ton
+                          </div>
+                          <div className="text-xs text-muted-foreground">Peso</div>
+                        </div>
+                        <div className="text-center p-3 bg-white/80 rounded-xl border border-purple-200">
+                          <div className="text-lg font-bold text-purple-600">
+                            -{Math.ceil((slabForm.watch("length") * slabForm.watch("width")) / 20)} días
+                          </div>
+                          <div className="text-xs text-muted-foreground">Tiempo</div>
+                        </div>
+                        <div className="text-center p-3 bg-white/80 rounded-xl border border-orange-200">
+                          <div className="text-lg font-bold text-orange-600">
+                            $-{((slabForm.watch("length") * slabForm.watch("width")) * 85).toLocaleString()}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Costo Est.</div>
+                        </div>
+                      </div>
+                      
+                      <p className="text-xs text-muted-foreground text-center italic">
+                        Valores estimados basados en comparación con losa maciza de 15cm. Consulte presupuesto formal para cifras exactas.
+                      </p>
                     </div>
                   )}
 
