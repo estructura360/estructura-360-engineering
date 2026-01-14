@@ -2,7 +2,8 @@ import { Link, useLocation } from "wouter";
 import { Calculator, BarChart3, FileText, BookOpen, Menu, Hammer, HardHat, Info, ShoppingBag, CalendarDays, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -80,7 +81,10 @@ export function Sidebar() {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-[280px] border-r-0">
+          <SheetContent side="left" className="p-0 w-[280px] border-r-0" aria-describedby={undefined}>
+            <VisuallyHidden>
+              <SheetTitle>Menú de navegación</SheetTitle>
+            </VisuallyHidden>
             <NavContent />
           </SheetContent>
         </Sheet>

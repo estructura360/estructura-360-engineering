@@ -122,8 +122,13 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(constructionLogs).where(eq(constructionLogs.projectId, projectId));
   }
 
-  async createLog(log: InsertLog): Promise<ConstructionLog> {
-    const [newLog] = await db.insert(constructionLogs).values(log).returning();
+  async createLog(log: InsertLog & { timestamp?: string | Date }): Promise<ConstructionLog> {
+    const { timestamp, ...rest } = log;
+    const logData: any = { ...rest };
+    if (timestamp) {
+      logData.timestamp = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+    }
+    const [newLog] = await db.insert(constructionLogs).values(logData).returning();
     return newLog;
   }
 }
