@@ -5,6 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { Info, Target, Zap, Shield, Heart, Leaf, ArrowRight, CheckCircle2, TrendingDown, Clock, Weight, Building, Users, Award, Calculator, FileText, BarChart3, Calendar } from "lucide-react";
 
+import heroImage from "@assets/stock_images/modern_construction__c2e16b69.jpg";
+import blueprintImage from "@assets/stock_images/construction_enginee_10031660.jpg";
+import workerImage from "@assets/stock_images/professional_constru_4a783fb5.jpg";
+import houseImage from "@assets/stock_images/modern_house_constru_639f58c6.jpg";
+
 const stats = [
   { value: "45%", label: "Menos peso estructural", icon: Weight },
   { value: "50%", label: "Más rápido de construir", icon: Clock },
@@ -56,10 +61,13 @@ export default function AboutPage() {
   return (
     <Layout>
       <div className="space-y-16 pb-12">
-        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary via-primary/95 to-primary/80 text-white p-4 sm:p-6 md:p-8 lg:p-12">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOCAxOC04LjA1OSAxOC0xOC04LjA1OS0xOC0xOC0xOHoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4wNSIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9nPjwvc3ZnPg==')] opacity-50" />
+        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl text-white">
+          <div className="absolute inset-0">
+            <img src={heroImage} alt="Construcción moderna" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/85 to-primary/75" />
+          </div>
           
-          <div className="relative max-w-4xl mx-auto text-center space-y-6">
+          <div className="relative max-w-4xl mx-auto text-center space-y-6 p-4 sm:p-6 md:p-8 lg:p-12">
             <Badge variant="secondary" className="bg-white/20 text-white border-0 hover:bg-white/30">
               Tecnología Construtech
             </Badge>
@@ -171,6 +179,25 @@ export default function AboutPage() {
                 ))}
               </CardContent>
             </Card>
+          </div>
+        </section>
+
+        <section className="grid md:grid-cols-2 gap-8 items-center max-w-6xl mx-auto">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+            <img src={blueprintImage} alt="Planos de ingeniería" className="w-full h-64 md:h-80 object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <h3 className="font-bold text-lg">Precisión en Cada Cálculo</h3>
+              <p className="text-sm text-white/80">Herramientas validadas por ingenieros estructuristas</p>
+            </div>
+          </div>
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+            <img src={workerImage} alt="Profesional de construcción" className="w-full h-64 md:h-80 object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-accent/60 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <h3 className="font-bold text-lg">Para Profesionales</h3>
+              <p className="text-sm text-white/80">Diseñado para constructores, ingenieros y arquitectos</p>
+            </div>
           </div>
         </section>
 

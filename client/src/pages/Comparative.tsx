@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LineChart, Line } from "recharts";
 import { Clock, Weight, Box, Zap, TrendingDown, Shield, ThermometerSun, Hammer, DollarSign, Building2, Waves, CheckCircle2, XCircle, AlertTriangle, Lightbulb, Leaf, Timer, Users, Award, ArrowRight, Loader2 } from "lucide-react";
 
+import houseImage from "@assets/stock_images/modern_house_constru_1482b528.jpg";
+
 const COLORS = ['#f97316', '#0f172a', '#10b981', '#3b82f6', '#8b5cf6'];
 
 const technicalSpecs = [
@@ -189,12 +191,17 @@ export default function ComparativePage() {
 
   return (
     <Layout>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-display font-bold text-primary" data-testid="text-page-title">Análisis Comparativo</h1>
-          <p className="text-muted-foreground mt-2">Por qué Vigueta y Bovedilla es la mejor elección para tu proyecto</p>
-        </div>
-        <div className="w-full sm:w-[300px]">
+      <div className="relative overflow-hidden rounded-2xl mb-8">
+          <div className="absolute inset-0">
+            <img src={houseImage} alt="Casa moderna" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/80 to-transparent" />
+          </div>
+          <div className="relative p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="text-white">
+              <h1 className="text-2xl sm:text-3xl font-display font-bold" data-testid="text-page-title">Análisis Comparativo</h1>
+              <p className="text-white/80 mt-2">Por qué Vigueta y Bovedilla es la mejor elección para tu proyecto</p>
+            </div>
+            <div className="w-full sm:w-[300px]">
           <Select value={selectedProjectId} onValueChange={setSelectedProjectId} disabled={isLoadingProjects}>
             <SelectTrigger className="w-full bg-white shadow-sm border-primary/20" data-testid="select-project">
               <SelectValue placeholder={isLoadingProjects ? "Cargando..." : "Seleccionar Proyecto"} />
@@ -207,8 +214,9 @@ export default function ComparativePage() {
               ))}
             </SelectContent>
           </Select>
+            </div>
+          </div>
         </div>
-      </div>
 
       <Tabs defaultValue="overview" className="space-y-8">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto p-1 bg-muted/50 rounded-xl gap-1">

@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Ruler, Layers, ShieldCheck, Zap, ThermometerSun, Clock, Weight, CheckCircle2, ArrowDown, Hammer, Truck, HardHat, Wrench, Building, BookOpen, AlertCircle, Lightbulb, Package, Construction, Grid3X3 } from "lucide-react";
 
+import constructionImage from "@assets/stock_images/modern_construction__77c2c1d4.jpg";
+
 const beams = [
   { 
     name: "P-15", 
@@ -184,9 +186,15 @@ export default function TechnicalPage() {
 
   return (
     <Layout>
-      <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-display font-bold text-primary" data-testid="text-page-title">Centro de Conocimiento</h1>
-        <p className="text-muted-foreground mt-2">Todo lo que necesitas saber sobre el sistema Vigueta y Bovedilla</p>
+      <div className="relative overflow-hidden rounded-2xl mb-8">
+        <div className="absolute inset-0">
+          <img src={constructionImage} alt="Construcción" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/80 to-primary/60" />
+        </div>
+        <div className="relative p-6 sm:p-8 text-white">
+          <h1 className="text-2xl sm:text-3xl font-display font-bold" data-testid="text-page-title">Centro de Conocimiento</h1>
+          <p className="text-white/80 mt-2">Todo lo que necesitas saber sobre el sistema Vigueta y Bovedilla</p>
+        </div>
       </div>
 
       <Tabs defaultValue="system" className="space-y-8">
