@@ -8,46 +8,47 @@
   --font-body: 'Inter', sans-serif;
   --font-display: 'Space Grotesk', sans-serif;
 
-  /* Azul Marino Profundo (#1A237E) - Primary */
-  --primary: 234 67% 30%;
+  /* Negro Carbón (#212121) - Primary/Typography */
+  --primary: 0 0% 13%;
   --primary-foreground: 0 0% 100%;
 
-  /* Amarillo Construcción (#FBC02D) - Accent/CTA */
-  --accent: 45 97% 58%;
-  --accent-foreground: 234 67% 20%;
+  /* Naranja Ladrillo (#D84315) - Accent/CTA */
+  --accent: 14 82% 46%;
+  --accent-foreground: 0 0% 100%;
 
-  /* Backgrounds - Blanco Humo (#F5F5F5) */
-  --background: 0 0% 96%;
-  --foreground: 234 67% 30%;
+  /* Backgrounds - Crema Suave (#FAFAFA) */
+  --background: 0 0% 98%;
+  --foreground: 0 0% 13%;
   
   --card: 0 0% 100%;
-  --card-foreground: 234 67% 30%;
+  --card-foreground: 0 0% 13%;
   
   --popover: 0 0% 100%;
-  --popover-foreground: 234 67% 30%;
+  --popover-foreground: 0 0% 13%;
 
-  /* Gris Cemento (#757575) */
-  --muted: 0 0% 92%;
+  /* Gris Acero (#BDBDBD) */
+  --muted: 0 0% 96%;
   --muted-foreground: 0 0% 46%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 0 0% 88%;
-  --input: 0 0% 88%;
-  --ring: 234 67% 30%;
+  /* Gris Acero for borders */
+  --border: 0 0% 74%;
+  --input: 0 0% 74%;
+  --ring: 14 82% 46%;
 
   --radius: 0.5rem;
 
-  /* Sidebar - Navy Deep */
-  --sidebar-background: 234 67% 30%;
+  /* Sidebar - Negro Carbón with Naranja accents */
+  --sidebar-background: 0 0% 13%;
   --sidebar-foreground: 0 0% 100%;
-  --sidebar-primary: 45 97% 58%;
-  --sidebar-primary-foreground: 234 67% 20%;
-  --sidebar-accent: 234 50% 40%;
+  --sidebar-primary: 14 82% 46%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 20%;
   --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-border: 234 50% 25%;
-  --sidebar-ring: 45 97% 58%;
+  --sidebar-border: 0 0% 20%;
+  --sidebar-ring: 14 82% 46%;
 }
 
 @layer base {
