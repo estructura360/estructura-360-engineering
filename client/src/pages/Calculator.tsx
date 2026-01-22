@@ -12,7 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useProjects, useCreateProject, useAddCalculation, useDeleteProject } from "@/hooks/use-projects";
-import { Plus, Save, Loader2, Layers, BrickWall, FileImage, Trash2 } from "lucide-react";
+import { Plus, Save, Loader2, Layers, BrickWall, FileImage, Trash2, Scale } from "lucide-react";
+import { SlabComparator } from "@/components/SlabComparator";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -268,23 +269,34 @@ export default function CalculatorPage() {
         </Card>
       </div>
 
-      <Tabs defaultValue="slab" className="max-w-4xl mx-auto">
-        <TabsList className="grid w-full grid-cols-2 mb-6 sm:mb-8 h-auto p-1 bg-muted/50 rounded-xl sm:rounded-2xl">
-          <TabsTrigger value="slab" className="rounded-lg sm:rounded-xl py-2 sm:py-3 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all duration-300">
+      <Tabs defaultValue="comparator" className="max-w-5xl mx-auto">
+        <TabsList className="grid w-full grid-cols-3 mb-6 sm:mb-8 h-auto p-1 bg-muted/50 rounded-xl sm:rounded-2xl">
+          <TabsTrigger value="comparator" className="rounded-lg sm:rounded-xl py-2 sm:py-3 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all duration-300" data-testid="tab-comparator">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Scale className="w-4 h-4" />
+              <span className="font-semibold text-xs sm:text-sm">Comparador</span>
+              <span className="hidden lg:inline font-semibold text-sm">(Tradicional vs V&B)</span>
+            </div>
+          </TabsTrigger>
+          <TabsTrigger value="slab" className="rounded-lg sm:rounded-xl py-2 sm:py-3 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all duration-300" data-testid="tab-slab">
             <div className="flex items-center gap-1 sm:gap-2">
               <Layers className="w-4 h-4" />
               <span className="font-semibold text-xs sm:text-sm">Losa</span>
-              <span className="hidden sm:inline font-semibold text-sm">(Vigueta y Bovedilla)</span>
+              <span className="hidden lg:inline font-semibold text-sm">(Vigueta y Bovedilla)</span>
             </div>
           </TabsTrigger>
-          <TabsTrigger value="wall" className="rounded-lg sm:rounded-xl py-2 sm:py-3 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all duration-300">
+          <TabsTrigger value="wall" className="rounded-lg sm:rounded-xl py-2 sm:py-3 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all duration-300" data-testid="tab-wall">
             <div className="flex items-center gap-1 sm:gap-2">
               <BrickWall className="w-4 h-4" />
               <span className="font-semibold text-xs sm:text-sm">Muro</span>
-              <span className="hidden sm:inline font-semibold text-sm">(Panel Estructural)</span>
+              <span className="hidden lg:inline font-semibold text-sm">(Panel Estructural)</span>
             </div>
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="comparator" className="space-y-6">
+          <SlabComparator />
+        </TabsContent>
 
         <TabsContent value="slab" className="space-y-6">
           <Card className="border-0 shadow-xl shadow-primary/5 overflow-hidden">
