@@ -19,8 +19,10 @@ interface MaterialPrices {
   sand: number;
   gravel: number;
   water: number;
-  vigueta: number;
-  bovedilla: number;
+  viguetaP15: number;  // $/pieza peralte 15
+  viguetaP20: number;  // $/pieza peralte 20
+  viguetaP25: number;  // $/pieza peralte 25
+  bovedilla: number;   // $/m³
 }
 
 interface SlabDimensions {
@@ -132,7 +134,9 @@ export function SlabComparator() {
     sand: 0,
     gravel: 0,
     water: 0,
-    vigueta: 0,
+    viguetaP15: 0,
+    viguetaP20: 0,
+    viguetaP25: 0,
     bovedilla: 0,
   });
 
@@ -272,9 +276,17 @@ export function SlabComparator() {
       (vbWater * prices.water);
     
     // V&B prefab components cost
-    const vbComponentsCost = 
-      (totalViguetaMeters * prices.vigueta * viguetaConfig.factor) +
-      (totalBovedillas * prices.bovedilla);
+    // Vigueta: precio por pieza según peralte
+    const viguetaCount = layout.joistPositions.length;
+    const viguetaPricePerPiece = peralteInfo.peralte === 15 ? prices.viguetaP15 : 
+                                  peralteInfo.peralte === 20 ? prices.viguetaP20 : prices.viguetaP25;
+    const viguetaCost = viguetaCount * viguetaPricePerPiece * viguetaConfig.factor;
+    
+    // Bovedilla: precio por m³
+    const bovedillaVolume = totalBovedillas * BOVEDILLA.length * BOVEDILLA.width * BOVEDILLA.height;
+    const bovedillaCost = bovedillaVolume * prices.bovedilla;
+    
+    const vbComponentsCost = viguetaCost + bovedillaCost;
     
     // Total V&B cost: concrete savings + components, capped at 70% of traditional (30% savings minimum)
     // This reflects real-world V&B economics where the system is always more economical
@@ -646,20 +658,46 @@ export function SlabComparator() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="vigueta" className="text-sm">Vigueta ($/metro)</Label>
+                  <Label htmlFor="viguetaP15" className="text-sm">Vigueta P-15 ($/pieza)</Label>
                   <Input
-                    id="vigueta"
+                    id="viguetaP15"
                     type="number"
                     min="0"
-                    value={prices.vigueta || ""}
-                    onChange={(e) => handlePriceChange("vigueta", e.target.value)}
+                    value={prices.viguetaP15 || ""}
+                    onChange={(e) => handlePriceChange("viguetaP15", e.target.value)}
                     placeholder="0"
                     className="h-11"
-                    data-testid="input-vigueta-price"
+                    data-testid="input-vigueta-p15-price"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="bovedilla" className="text-sm">Bovedilla ($/pieza)</Label>
+                  <Label htmlFor="viguetaP20" className="text-sm">Vigueta P-20 ($/pieza)</Label>
+                  <Input
+                    id="viguetaP20"
+                    type="number"
+                    min="0"
+                    value={prices.viguetaP20 || ""}
+                    onChange={(e) => handlePriceChange("viguetaP20", e.target.value)}
+                    placeholder="0"
+                    className="h-11"
+                    data-testid="input-vigueta-p20-price"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="viguetaP25" className="text-sm">Vigueta P-25 ($/pieza)</Label>
+                  <Input
+                    id="viguetaP25"
+                    type="number"
+                    min="0"
+                    value={prices.viguetaP25 || ""}
+                    onChange={(e) => handlePriceChange("viguetaP25", e.target.value)}
+                    placeholder="0"
+                    className="h-11"
+                    data-testid="input-vigueta-p25-price"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="bovedilla" className="text-sm">Bovedilla ($/m³)</Label>
                   <Input
                     id="bovedilla"
                     type="number"
