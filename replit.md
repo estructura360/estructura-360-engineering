@@ -65,13 +65,19 @@ Compares Losa Tradicional (12cm) vs Losa Vigueta Bovedilla with polystyrene:
 - Weight: Traditional 288 kg/m² vs V&B 180 kg/m²
 - Time: 40% reduction with V&B system
 
+**Layout Algorithm:**
+- Viguetas: Divide longest side by 0.70, round DOWN (e.g., 10/0.7=14.28 → 14 viguetas)
+- No viguetas at edges (perimeter chain/wall space)
+- Bovedillas: Fill 100% of spaces between viguetas (1.22×0.63m pieces)
+- Adjustment pieces: Cut bovedillas to fill remainders (no empty gaps)
+
 **Features:**
 - Dimensions input starting at 0
 - Support type selector: Muros de Carga vs Trabes de Concreto (+15% vigueta cost)
 - Price inputs: Cement, Sand, Gravel, Water, Vigueta, Bovedilla
 - Compression layer slider (3-7 cm)
 - Comparative materials table with costs
-- SVG floor plan: AutoCAD dark style, cyan viguetas, orange bovedillas
+- SVG floor plan: AutoCAD dark style, cyan viguetas, orange bovedillas, adjustment pieces
 - Worker slider (1-30) for time estimation
 - PDF budget generation with comparison table
 

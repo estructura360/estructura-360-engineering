@@ -60,9 +60,12 @@ interface CalculationResults {
   };
   layout: {
     joistPositions: number[];
-    bovedillaRows: { y: number; pieces: number; adjustmentWidth: number }[];
+    bovedillaRows: { y: number; pieces: { x: number; width: number; isAdjustment: boolean }[] }[];
     orientation: "length" | "width";
     chainWidth: number;
+    numJoists: number;
+    longestSide: number;
+    shortestSide: number;
   };
 }
 
@@ -126,37 +129,68 @@ export function SlabComparator() {
     const { length, width } = dimensions;
     const chainWidth = 0.15;
     
-    const effectiveLength = length - (chainWidth * 2);
-    const effectiveWidth = width - (chainWidth * 2);
+    const longestSide = Math.max(length, width);
+    const shortestSide = Math.min(length, width);
+    const orientation = length >= width ? "length" : "width";
     
-    const useLength = effectiveLength >= effectiveWidth;
-    const joistSpan = useLength ? effectiveLength : effectiveWidth;
-    const crossSpan = useLength ? effectiveWidth : effectiveLength;
+    const numJoists = Math.floor(longestSide / BOVEDILLA.axisDistance);
     
-    const numJoists = Math.floor(crossSpan / BOVEDILLA.axisDistance);
     const joistPositions: number[] = [];
+    const joistSpacing = longestSide / (numJoists + 1);
     
     for (let i = 1; i <= numJoists; i++) {
-      joistPositions.push(chainWidth + (i * BOVEDILLA.axisDistance) - (BOVEDILLA.axisDistance / 2));
+      joistPositions.push(joistSpacing * i);
     }
     
-    const bovedillaRows: { y: number; pieces: number; adjustmentWidth: number }[] = [];
-    const piecesPerRow = Math.floor(joistSpan / BOVEDILLA.length);
-    const adjustmentWidth = joistSpan - (piecesPerRow * BOVEDILLA.length);
+    const bovedillaRows: { y: number; pieces: { x: number; width: number; isAdjustment: boolean }[] }[] = [];
     
-    for (let i = 0; i < numJoists - 1; i++) {
+    const spaceBetweenJoists = joistSpacing;
+    const bovedillaEffectiveWidth = BOVEDILLA.width;
+    
+    for (let i = 0; i <= numJoists; i++) {
+      const rowStart = i === 0 ? chainWidth : joistPositions[i - 1];
+      const rowEnd = i === numJoists ? longestSide - chainWidth : joistPositions[i];
+      const rowWidth = rowEnd - rowStart;
+      
+      if (rowWidth <= 0) continue;
+      
+      const pieces: { x: number; width: number; isAdjustment: boolean }[] = [];
+      let currentX = chainWidth;
+      const availableLength = shortestSide - (chainWidth * 2);
+      
+      const fullPieces = Math.floor(availableLength / BOVEDILLA.length);
+      const remainder = availableLength - (fullPieces * BOVEDILLA.length);
+      
+      for (let p = 0; p < fullPieces; p++) {
+        pieces.push({
+          x: currentX + (p * BOVEDILLA.length),
+          width: BOVEDILLA.length,
+          isAdjustment: false,
+        });
+      }
+      
+      if (remainder > 0.01) {
+        pieces.push({
+          x: currentX + (fullPieces * BOVEDILLA.length),
+          width: remainder,
+          isAdjustment: true,
+        });
+      }
+      
       bovedillaRows.push({
-        y: chainWidth + (i * BOVEDILLA.axisDistance) + (BOVEDILLA.axisDistance / 2) - (BOVEDILLA.width / 2),
-        pieces: piecesPerRow + (adjustmentWidth > 0.1 ? 1 : 0),
-        adjustmentWidth: adjustmentWidth > 0.1 ? adjustmentWidth : 0,
+        y: rowStart,
+        pieces,
       });
     }
     
     return {
       joistPositions,
       bovedillaRows,
-      orientation: useLength ? "length" : "width" as "length" | "width",
+      orientation: orientation as "length" | "width",
       chainWidth,
+      numJoists,
+      longestSide,
+      shortestSide,
     };
   };
 
@@ -178,8 +212,12 @@ export function SlabComparator() {
       (layout.orientation === "length" ? dimensions.length : dimensions.width);
     
     let totalBovedillas = 0;
+    let adjustmentPieces = 0;
     layout.bovedillaRows.forEach(row => {
-      totalBovedillas += row.pieces;
+      totalBovedillas += row.pieces.length;
+      row.pieces.forEach(piece => {
+        if (piece.isAdjustment) adjustmentPieces++;
+      });
     });
     
     const vbConcreteVolume = traditionalVolume * COEFFICIENTS.vbSavingsFactor;
@@ -861,25 +899,27 @@ export function SlabComparator() {
                     ))}
                     
                     {results.layout.bovedillaRows.map((row, rowIdx) => {
-                      const pieces = [];
-                      for (let p = 0; p < row.pieces; p++) {
-                        const isAdjustment = p === row.pieces - 1 && row.adjustmentWidth > 0;
-                        const pieceWidth = isAdjustment ? row.adjustmentWidth : BOVEDILLA.length;
-                        pieces.push(
-                          <rect
-                            key={`bov-${rowIdx}-${p}`}
-                            x={(results.layout.chainWidth + p * BOVEDILLA.length) * 50}
-                            y={row.y * 50}
-                            width={pieceWidth * 50 - 2}
-                            height={BOVEDILLA.width * 50 - 2}
-                            fill={isAdjustment ? "#fb923c" : "#f97316"}
-                            fillOpacity="0.3"
-                            stroke="#f97316"
-                            strokeWidth="1"
-                          />
-                        );
-                      }
-                      return pieces;
+                      const nextJoistPos = rowIdx < results.layout.joistPositions.length 
+                        ? results.layout.joistPositions[rowIdx] 
+                        : results.layout.longestSide - results.layout.chainWidth;
+                      const prevJoistPos = rowIdx === 0 
+                        ? results.layout.chainWidth 
+                        : results.layout.joistPositions[rowIdx - 1];
+                      const rowHeight = nextJoistPos - prevJoistPos;
+                      
+                      return row.pieces.map((piece, pIdx) => (
+                        <rect
+                          key={`bov-${rowIdx}-${pIdx}`}
+                          x={piece.x * 50}
+                          y={prevJoistPos * 50 + 2}
+                          width={piece.width * 50 - 2}
+                          height={rowHeight * 50 - 4}
+                          fill={piece.isAdjustment ? "#fb923c" : "#f97316"}
+                          fillOpacity="0.3"
+                          stroke={piece.isAdjustment ? "#fb923c" : "#f97316"}
+                          strokeWidth="1"
+                        />
+                      ));
                     })}
                     
                     <text x={dimensions.length * 25} y={-15} fill="#e2e8f0" fontSize="12" textAnchor="middle">

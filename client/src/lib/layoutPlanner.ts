@@ -5,11 +5,11 @@
 const STANDARD_LENGTHS = [3, 4, 5, 6];
 
 // Standard spacing between joists (center to center) in meters
-const JOIST_SPACING = 0.75; // 75cm typical
+const JOIST_SPACING = 0.70; // 70cm as per specification
 
-// Vault dimensions (standard bovedilla)
-const VAULT_WIDTH = 0.60; // 60cm between joists
-const VAULT_LENGTH = 0.25; // 25cm along joist direction
+// Vault dimensions (standard bovedilla de poliestireno)
+const VAULT_LENGTH = 1.22; // 1.22m along joist direction
+const VAULT_WIDTH = 0.63; // 0.63m perpendicular
 
 export interface LayoutResult {
   orientation: 'horizontal' | 'vertical';
@@ -42,8 +42,9 @@ interface OrientationAnalysis {
 }
 
 function analyzeOrientation(joistDirection: number, perpendicular: number): OrientationAnalysis {
-  // Joists run along joistDirection, spaced along perpendicular
-  const joistCount = Math.ceil(perpendicular / JOIST_SPACING) + 1;
+  // Joists are calculated by dividing the LONGEST side by 0.70 and rounding DOWN
+  // Joists run along joistDirection (the shorter side), spaced along perpendicular (longer side)
+  const joistCount = Math.floor(perpendicular / JOIST_SPACING);
   const joistLength = joistDirection;
   
   // For spans > 6m, we need multiple pieces with lap splice
@@ -114,10 +115,14 @@ export function calculateLayout(lengthInput: number, widthInput: number): Layout
     });
   }
   
-  // Calculate vaults
-  const baysCount = analysis.joistCount - 1;
+  // Calculate vaults - fill 100% of spaces between joists
+  // Number of "streets" (calles) = numJoists + 1 (including edge spaces)
+  const baysCount = analysis.joistCount + 1;
   const joistDirectionLength = analysis.joistLength;
-  const vaultsPerBay = Math.floor(joistDirectionLength / VAULT_LENGTH);
+  // Full pieces + adjustment piece if there's remainder
+  const fullPiecesPerBay = Math.floor(joistDirectionLength / VAULT_LENGTH);
+  const remainder = joistDirectionLength - (fullPiecesPerBay * VAULT_LENGTH);
+  const vaultsPerBay = fullPiecesPerBay + (remainder > 0.01 ? 1 : 0);
   const totalVaults = baysCount * vaultsPerBay;
   
   // Generate recommendations
