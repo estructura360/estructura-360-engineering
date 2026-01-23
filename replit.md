@@ -69,10 +69,6 @@ Compares Losa Tradicional (10cm) vs Losa Vigueta Bovedilla with polystyrene:
 - Dimensions: 1.22m × 0.63m × 0.12m
 - Axis distance: 70cm between viguetas
 
-**EPS Wall Panels (optional):**
-- 8% cost increase vs traditional walls
-- Benefits: thermal/acoustic insulation, energy savings, less structural weight
-
 **Comparison Logic:**
 - V&B applies 30% material savings vs traditional slab
 - Weight: Traditional 288 kg/m² vs V&B 180 kg/m²

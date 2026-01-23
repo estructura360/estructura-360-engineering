@@ -13,7 +13,6 @@ import autoTable from "jspdf-autotable";
 
 import viguetaAlmaAbiertaImg from "@/assets/vigueta-alma-abierta.jpeg";
 import viguetaPretensadaImg from "@/assets/vigueta-pretensada.jpeg";
-import panelEpsImg from "@/assets/panel-eps.png";
 
 interface MaterialPrices {
   cement: number;
@@ -143,7 +142,6 @@ export function SlabComparator() {
   });
 
   const [viguetaType, setViguetaType] = useState<"almaAbierta" | "pretensada">("almaAbierta");
-  const [useEpsWalls, setUseEpsWalls] = useState(false);
   const [workers, setWorkers] = useState(5);
   const [results, setResults] = useState<CalculationResults | null>(null);
   const [compressionLayer, setCompressionLayer] = useState(7);
@@ -282,12 +280,7 @@ export function SlabComparator() {
     // This reflects real-world V&B economics where the system is always more economical
     const vbRawCost = vbConcreteCost + vbComponentsCost;
     const vbMaxCost = traditionalCost * COEFFICIENTS.vbSavingsFactor; // 70% of traditional = 30% savings
-    let vbCost = Math.min(vbRawCost, vbMaxCost);
-    
-    // Apply EPS wall panel cost increase (+8%) if selected
-    if (useEpsWalls) {
-      vbCost = vbCost * 1.08;
-    }
+    const vbCost = Math.min(vbRawCost, vbMaxCost);
     
     const traditionalWeight = area * COEFFICIENTS.traditionalWeight;
     const vbWeight = area * COEFFICIENTS.vbWeight;
@@ -590,53 +583,6 @@ export function SlabComparator() {
                 </div>
               </div>
 
-              <div>
-                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4 block">
-                  Muros de Poliestireno (EPS)
-                </Label>
-                <div
-                  onClick={() => setUseEpsWalls(!useEpsWalls)}
-                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    useEpsWalls 
-                      ? "border-primary bg-primary/5" 
-                      : "border-border hover:border-primary/50"
-                  }`}
-                  data-testid="toggle-eps-walls"
-                >
-                  <div className="flex items-start gap-4">
-                    <img 
-                      src={panelEpsImg} 
-                      alt="Panel Estructural EPS" 
-                      className="w-24 h-24 object-contain rounded-lg bg-white flex-shrink-0"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                          useEpsWalls ? "border-primary bg-primary" : "border-muted-foreground"
-                        }`}>
-                          {useEpsWalls && <CheckCircle2 className="h-3 w-3 text-primary-foreground" />}
-                        </div>
-                        <span className="font-medium">Panel Estructural EPS</span>
-                        <Badge variant="secondary" className="ml-auto">+8% costo</Badge>
-                      </div>
-                      <div className="text-xs text-muted-foreground space-y-1">
-                        <div className="flex items-center gap-1">
-                          <CheckCircle2 className="h-3 w-3 text-green-500" />
-                          <span>Aislamiento térmico y acústico</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <CheckCircle2 className="h-3 w-3 text-green-500" />
-                          <span>Ahorro en consumo de luz</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <CheckCircle2 className="h-3 w-3 text-green-500" />
-                          <span>Menor peso estructural</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <div className="space-y-6">
