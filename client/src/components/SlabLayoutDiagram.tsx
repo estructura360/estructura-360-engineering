@@ -245,6 +245,16 @@ export function SlabLayoutDiagram({ layout, length: lengthProp, width: widthProp
           </Badge>
           <span>| Claro: {layout.joistLength.toFixed(2)}m</span>
         </div>
+        
+        {/* Concrete recommendation */}
+        <div className="mt-3 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+          <p className="text-sm text-center font-medium text-primary">
+            Resistencia de concreto recomendada: f'c = 250 kg/cm²
+          </p>
+          <p className="text-xs text-center text-muted-foreground mt-1">
+            Para Losa Vigueta Bovedilla con capa de compresión de 4-7 cm
+          </p>
+        </div>
       </div>
     </Card>
   );

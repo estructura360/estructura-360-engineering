@@ -74,7 +74,7 @@ const installationSteps = [
   {
     step: 5,
     title: "Colado",
-    description: "Usar concreto f'c=200-250 kg/cm² con revenimiento 12-14 cm. Espesor mínimo de capa de compresión: 4cm sobre bovedilla.",
+    description: "Usar concreto f'c=250 kg/cm² (recomendado para Losa Vigueta Bovedilla) con revenimiento 12-14 cm. Espesor mínimo de capa de compresión: 4cm sobre bovedilla.",
     duration: "Depende del área",
     icon: Construction,
     tips: ["No concentrar concreto en un punto", "Vibrar ligeramente", "Curar por mínimo 7 días"]
@@ -143,7 +143,7 @@ const components = [
     name: "Capa de Compresión",
     description: "Firme de concreto que une todos los elementos y forma el diafragma rígido de la losa.",
     specs: [
-      { label: "Concreto", value: "f'c ≥ 200 kg/cm²" },
+      { label: "Concreto", value: "f'c = 250 kg/cm² (recomendado)" },
       { label: "Espesor mínimo", value: "4 cm sobre bovedilla" },
       { label: "Revenimiento", value: "12-14 cm" },
       { label: "Curado", value: "7 días húmedo mínimo" },

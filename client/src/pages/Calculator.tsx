@@ -408,6 +408,12 @@ export default function CalculatorPage() {
                       <p className="text-xs text-muted-foreground text-center italic">
                         Valores estimados basados en comparación con losa maciza de 15cm. Consulte presupuesto formal para cifras exactas.
                       </p>
+                      
+                      <div className="mt-3 p-2 bg-primary/10 border border-primary/20 rounded-lg">
+                        <p className="text-xs text-center font-medium text-primary">
+                          Resistencia recomendada: f'c = 250 kg/cm² para Losa Vigueta Bovedilla
+                        </p>
+                      </div>
                     </div>
                   )}
 
