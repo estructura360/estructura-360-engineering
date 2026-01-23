@@ -119,11 +119,11 @@ const VIGUETA_TYPES = {
   },
 };
 
-// Selección automática de peralte según lado más corto
-// ≤1.9m → Peralte 15, 1.9-5m → Peralte 20, 5-6m → Peralte 25
+// Selección automática de peralte según lado más corto (claro)
+// ≤1.9m → Peralte 15, 1.9-5m → Peralte 20, >5m → Peralte 25
 const getPeralte = (shortestSide: number): { peralte: number; label: string } => {
   if (shortestSide <= 1.9) return { peralte: 15, label: "Peralte 15 cm" };
-  if (shortestSide < 5) return { peralte: 20, label: "Peralte 20 cm" };
+  if (shortestSide <= 5) return { peralte: 20, label: "Peralte 20 cm" };
   return { peralte: 25, label: "Peralte 25 cm" };
 };
 
@@ -140,26 +140,18 @@ interface ViguetaDistribution {
   p25: number;
 }
 
-// Recomendar distribución de viguetas según claro
+// Recomendar distribución de viguetas según claro - UN SOLO TIPO DE PERALTE
 const recommendViguetaDistribution = (shortestSide: number, totalViguetas: number): ViguetaDistribution => {
-  // Basado en el claro (lado más corto), recomendamos el peralte adecuado
-  // Para claros mixtos, se puede usar combinación
+  // Basado en el claro (lado más corto), TODAS las viguetas son del mismo peralte
+  // Regla: ≤1.9m → P-15, 1.9-5m → P-20, >5m → P-25
   if (shortestSide <= 1.9) {
-    // Claro corto: todas P-15
+    // Claro corto: TODAS P-15
     return { p15: totalViguetas, p20: 0, p25: 0 };
-  } else if (shortestSide < 3.5) {
-    // Claro medio-corto: mayoría P-15, algunas P-20 para refuerzo en extremos
-    const p20Count = Math.min(2, Math.floor(totalViguetas * 0.2));
-    return { p15: totalViguetas - p20Count, p20: p20Count, p25: 0 };
-  } else if (shortestSide < 5) {
-    // Claro medio: todas P-20
+  } else if (shortestSide <= 5) {
+    // Claro medio (1.9m - 5m): TODAS P-20
     return { p15: 0, p20: totalViguetas, p25: 0 };
-  } else if (shortestSide < 5.5) {
-    // Claro medio-largo: mayoría P-20, algunas P-25 para refuerzo central
-    const p25Count = Math.min(Math.ceil(totalViguetas * 0.3), Math.floor(totalViguetas / 2));
-    return { p15: 0, p20: totalViguetas - p25Count, p25: p25Count };
   } else {
-    // Claro largo: todas P-25
+    // Claro largo (>5m): TODAS P-25
     return { p15: 0, p20: 0, p25: totalViguetas };
   }
 };
@@ -222,44 +214,23 @@ export function SlabComparator() {
       ? viguetaDistribution 
       : recommendViguetaDistribution(shortestSide, numJoists);
     
-    // Asignar peralte a cada vigueta según distribución
-    // P-25 en el centro (mayor carga), P-20 intermedias, P-15 en extremos
-    const peralteAssignments: (15 | 20 | 25)[] = [];
-    const center = Math.floor(numJoists / 2);
-    
-    // Inicializar con P-15 por defecto
-    for (let i = 0; i < numJoists; i++) {
-      peralteAssignments[i] = 15;
+    // Determinar el único peralte para TODAS las viguetas
+    // Basado en qué tipo tiene más cantidad en la distribución
+    let singlePeralte: 15 | 20 | 25 = 20; // Default
+    if (distribution.p25 > 0) {
+      singlePeralte = 25;
+    } else if (distribution.p20 > 0) {
+      singlePeralte = 20;
+    } else if (distribution.p15 > 0) {
+      singlePeralte = 15;
     }
     
-    // Asignar P-25 desde el centro hacia afuera
-    let p25Remaining = distribution.p25;
-    for (let offset = 0; offset <= center && p25Remaining > 0; offset++) {
-      if (center + offset < numJoists && p25Remaining > 0) {
-        peralteAssignments[center + offset] = 25;
-        p25Remaining--;
-      }
-      if (offset > 0 && center - offset >= 0 && p25Remaining > 0) {
-        peralteAssignments[center - offset] = 25;
-        p25Remaining--;
-      }
-    }
-    
-    // Asignar P-20 en las siguientes posiciones disponibles
-    let p20Remaining = distribution.p20;
-    for (let i = 0; i < numJoists && p20Remaining > 0; i++) {
-      if (peralteAssignments[i] !== 25) {
-        peralteAssignments[i] = 20;
-        p20Remaining--;
-      }
-    }
-    
-    // Posicionar viguetas uniformemente dentro del área útil
+    // Posicionar viguetas uniformemente - TODAS del mismo peralte
     for (let i = 0; i < numJoists; i++) {
       const pos = chainWidth + joistSpacing * (i + 1);
       joistPositions.push({
         pos,
-        peralte: peralteAssignments[i] || 15,
+        peralte: singlePeralte,
       });
     }
     
