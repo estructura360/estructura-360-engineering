@@ -206,12 +206,18 @@ export function SlabComparator() {
     const shortestSide = Math.min(length, width);
     const orientation = length >= width ? "length" : "width";
     
-    const numJoists = Math.floor(longestSide / BOVEDILLA.axisDistance);
+    // Área útil para viguetas (descontando cadenas perimetrales)
+    const usableLength = longestSide - (chainWidth * 2);
+    
+    // Número de viguetas: dividir el área útil entre el espaciado estándar (0.70m)
+    const numJoists = Math.max(1, Math.floor(usableLength / BOVEDILLA.axisDistance));
+    
+    // Espaciado real entre viguetas para distribuir uniformemente
+    const joistSpacing = usableLength / (numJoists + 1);
     
     const joistPositions: { pos: number; peralte: 15 | 20 | 25 }[] = [];
-    const joistSpacing = longestSide / (numJoists + 1);
     
-    // Obtener distribución de viguetas (recomendada o personalizada)
+    // Obtener distribución de viguetas basada en el LADO MÁS CORTO (claro)
     const distribution = useCustomDistribution 
       ? viguetaDistribution 
       : recommendViguetaDistribution(shortestSide, numJoists);
@@ -221,17 +227,13 @@ export function SlabComparator() {
     const peralteAssignments: (15 | 20 | 25)[] = [];
     const center = Math.floor(numJoists / 2);
     
-    // Primero asignamos P-25 en el centro
-    let p25Remaining = distribution.p25;
-    let p20Remaining = distribution.p20;
-    let p15Remaining = distribution.p15;
-    
+    // Inicializar con P-15 por defecto
     for (let i = 0; i < numJoists; i++) {
-      const distFromCenter = Math.abs(i - center);
-      peralteAssignments[i] = 15; // default
+      peralteAssignments[i] = 15;
     }
     
     // Asignar P-25 desde el centro hacia afuera
+    let p25Remaining = distribution.p25;
     for (let offset = 0; offset <= center && p25Remaining > 0; offset++) {
       if (center + offset < numJoists && p25Remaining > 0) {
         peralteAssignments[center + offset] = 25;
@@ -243,7 +245,8 @@ export function SlabComparator() {
       }
     }
     
-    // Asignar P-20 en las siguientes posiciones
+    // Asignar P-20 en las siguientes posiciones disponibles
+    let p20Remaining = distribution.p20;
     for (let i = 0; i < numJoists && p20Remaining > 0; i++) {
       if (peralteAssignments[i] !== 25) {
         peralteAssignments[i] = 20;
@@ -251,27 +254,28 @@ export function SlabComparator() {
       }
     }
     
-    for (let i = 1; i <= numJoists; i++) {
+    // Posicionar viguetas uniformemente dentro del área útil
+    for (let i = 0; i < numJoists; i++) {
+      const pos = chainWidth + joistSpacing * (i + 1);
       joistPositions.push({
-        pos: joistSpacing * i,
-        peralte: peralteAssignments[i - 1] || 15,
+        pos,
+        peralte: peralteAssignments[i] || 15,
       });
     }
     
     const bovedillaRows: { y: number; pieces: { x: number; width: number; isAdjustment: boolean }[] }[] = [];
     
-    const spaceBetweenJoists = joistSpacing;
-    const bovedillaEffectiveWidth = BOVEDILLA.width;
-    
+    // Crear filas de bovedillas entre cada par de viguetas y los bordes
     for (let i = 0; i <= numJoists; i++) {
       const rowStart = i === 0 ? chainWidth : joistPositions[i - 1].pos;
-      const rowEnd = i === numJoists ? longestSide - chainWidth : joistPositions[i].pos;
-      const rowWidth = rowEnd - rowStart;
+      const rowEnd = i === numJoists ? (longestSide - chainWidth) : joistPositions[i].pos;
+      const rowHeight = rowEnd - rowStart;
       
-      if (rowWidth <= 0) continue;
+      // Solo crear fila si hay espacio suficiente
+      if (rowHeight < 0.05) continue;
       
       const pieces: { x: number; width: number; isAdjustment: boolean }[] = [];
-      let currentX = chainWidth;
+      const startX = chainWidth;
       const availableLength = shortestSide - (chainWidth * 2);
       
       const fullPieces = Math.floor(availableLength / BOVEDILLA.length);
@@ -279,15 +283,16 @@ export function SlabComparator() {
       
       for (let p = 0; p < fullPieces; p++) {
         pieces.push({
-          x: currentX + (p * BOVEDILLA.length),
+          x: startX + (p * BOVEDILLA.length),
           width: BOVEDILLA.length,
           isAdjustment: false,
         });
       }
       
+      // Siempre rellenar el espacio restante con pieza de ajuste
       if (remainder > 0.01) {
         pieces.push({
-          x: currentX + (fullPieces * BOVEDILLA.length),
+          x: startX + (fullPieces * BOVEDILLA.length),
           width: remainder,
           isAdjustment: true,
         });
@@ -1049,7 +1054,7 @@ export function SlabComparator() {
             </CardContent>
           </Card>
 
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden" data-testid="card-floor-plan">
             <CardHeader className="bg-slate-900 text-white">
               <CardTitle className="text-lg">Plano de Distribución</CardTitle>
               <CardDescription className="text-slate-300">
@@ -1060,7 +1065,8 @@ export function SlabComparator() {
               <div className="p-4 overflow-auto">
                 <svg
                   ref={svgRef}
-                  viewBox={`0 0 ${Math.max(dimensions.length * 50 + 100, 400)} ${Math.max(dimensions.width * 50 + 100, 300)}`}
+                  data-testid="svg-floor-plan"
+                  viewBox={`0 0 ${Math.max(results.layout.longestSide * 50 + 200, 400)} ${Math.max(results.layout.shortestSide * 50 + 100, 250)}`}
                   className="w-full h-auto min-h-[300px] max-h-[500px]"
                   style={{ background: "#1e293b" }}
                 >
@@ -1073,11 +1079,13 @@ export function SlabComparator() {
                   <rect width="100%" height="100%" fill="url(#grid)" />
                   
                   <g transform="translate(50, 50)">
+                    {/* Plano siempre muestra: viguetas a lo largo del lado LARGO, espaciadas cada 0.70m */}
+                    {/* SVG: X = lado largo (donde van las viguetas), Y = lado corto (claro) */}
                     <rect
                       x="0"
                       y="0"
-                      width={dimensions.length * 50}
-                      height={dimensions.width * 50}
+                      width={results.layout.longestSide * 50}
+                      height={results.layout.shortestSide * 50}
                       fill="none"
                       stroke="#94a3b8"
                       strokeWidth="3"
@@ -1086,32 +1094,33 @@ export function SlabComparator() {
                     <rect
                       x={results.layout.chainWidth * 50}
                       y={results.layout.chainWidth * 50}
-                      width={(dimensions.length - results.layout.chainWidth * 2) * 50}
-                      height={(dimensions.width - results.layout.chainWidth * 2) * 50}
+                      width={(results.layout.longestSide - results.layout.chainWidth * 2) * 50}
+                      height={(results.layout.shortestSide - results.layout.chainWidth * 2) * 50}
                       fill="none"
                       stroke="#fbbf24"
                       strokeWidth="1"
                       strokeDasharray="5,3"
                     />
                     
+                    {/* Viguetas: líneas verticales espaciadas a lo largo del lado largo */}
                     {results.layout.joistPositions.map((joist, i) => {
                       const color = PERALTE_COLORS[joist.peralte];
                       return (
                         <g key={`joist-${i}`}>
                           <line
-                            x1={results.layout.chainWidth * 50}
-                            y1={joist.pos * 50}
-                            x2={(dimensions.length - results.layout.chainWidth) * 50}
-                            y2={joist.pos * 50}
+                            x1={joist.pos * 50}
+                            y1={results.layout.chainWidth * 50}
+                            x2={joist.pos * 50}
+                            y2={(results.layout.shortestSide - results.layout.chainWidth) * 50}
                             stroke={color.stroke}
                             strokeWidth="4"
                           />
                           <text
-                            x={-10}
-                            y={joist.pos * 50 + 4}
+                            x={joist.pos * 50}
+                            y={-8}
                             fill={color.fill}
                             fontSize="9"
-                            textAnchor="end"
+                            textAnchor="middle"
                           >
                             P{joist.peralte}
                           </text>
@@ -1119,6 +1128,7 @@ export function SlabComparator() {
                       );
                     })}
                     
+                    {/* Bovedillas: rectángulos entre viguetas */}
                     {results.layout.bovedillaRows.map((row, rowIdx) => {
                       const nextJoistPos = rowIdx < results.layout.joistPositions.length 
                         ? results.layout.joistPositions[rowIdx].pos 
@@ -1126,15 +1136,15 @@ export function SlabComparator() {
                       const prevJoistPos = rowIdx === 0 
                         ? results.layout.chainWidth 
                         : results.layout.joistPositions[rowIdx - 1].pos;
-                      const rowHeight = Math.max(0.1, nextJoistPos - prevJoistPos);
+                      const rowWidth = Math.max(0.1, nextJoistPos - prevJoistPos);
                       
                       return row.pieces.map((piece, pIdx) => (
                         <rect
                           key={`bov-${rowIdx}-${pIdx}`}
-                          x={piece.x * 50}
-                          y={prevJoistPos * 50 + 2}
-                          width={piece.width * 50 - 2}
-                          height={rowHeight * 50 - 4}
+                          x={prevJoistPos * 50 + 2}
+                          y={piece.x * 50}
+                          width={rowWidth * 50 - 4}
+                          height={piece.width * 50 - 2}
                           fill={piece.isAdjustment ? "#fb923c" : "#f97316"}
                           fillOpacity="0.3"
                           stroke={piece.isAdjustment ? "#fb923c" : "#f97316"}
@@ -1143,22 +1153,23 @@ export function SlabComparator() {
                       ));
                     })}
                     
-                    <text x={dimensions.length * 25} y={-15} fill="#e2e8f0" fontSize="12" textAnchor="middle">
-                      {dimensions.length.toFixed(2)} m
+                    {/* Etiquetas de dimensiones */}
+                    <text x={results.layout.longestSide * 25} y={-15} fill="#e2e8f0" fontSize="12" textAnchor="middle">
+                      {results.layout.longestSide.toFixed(2)} m (largo)
                     </text>
                     <text
-                      x={dimensions.length * 50 + 20}
-                      y={dimensions.width * 25}
+                      x={results.layout.longestSide * 50 + 20}
+                      y={results.layout.shortestSide * 25}
                       fill="#e2e8f0"
                       fontSize="12"
                       textAnchor="middle"
-                      transform={`rotate(90, ${dimensions.length * 50 + 20}, ${dimensions.width * 25})`}
+                      transform={`rotate(90, ${results.layout.longestSide * 50 + 20}, ${results.layout.shortestSide * 25})`}
                     >
-                      {dimensions.width.toFixed(2)} m
+                      {results.layout.shortestSide.toFixed(2)} m (claro)
                     </text>
                   </g>
                   
-                  <g transform={`translate(${dimensions.length * 50 + 80}, 60)`}>
+                  <g transform={`translate(${results.layout.longestSide * 50 + 80}, 60)`}>
                     <text fill="#e2e8f0" fontSize="11" fontWeight="bold">Leyenda Viguetas:</text>
                     {results.layout.distribution.p15 > 0 && (
                       <>
