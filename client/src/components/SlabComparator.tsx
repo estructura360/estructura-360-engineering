@@ -120,9 +120,9 @@ const VIGUETA_TYPES = {
 };
 
 // Selección automática de peralte según lado más corto (claro)
-// ≤1.9m → Peralte 15, 1.9-5m → Peralte 20, >5m → Peralte 25
+// ≤4m → Peralte 15, 4-5m → Peralte 20, >5m → Peralte 25
 const getPeralte = (shortestSide: number): { peralte: number; label: string } => {
-  if (shortestSide <= 1.9) return { peralte: 15, label: "Peralte 15 cm" };
+  if (shortestSide <= 4) return { peralte: 15, label: "Peralte 15 cm" };
   if (shortestSide <= 5) return { peralte: 20, label: "Peralte 20 cm" };
   return { peralte: 25, label: "Peralte 25 cm" };
 };
@@ -143,12 +143,12 @@ interface ViguetaDistribution {
 // Recomendar distribución de viguetas según claro - UN SOLO TIPO DE PERALTE
 const recommendViguetaDistribution = (shortestSide: number, totalViguetas: number): ViguetaDistribution => {
   // Basado en el claro (lado más corto), TODAS las viguetas son del mismo peralte
-  // Regla: ≤1.9m → P-15, 1.9-5m → P-20, >5m → P-25
-  if (shortestSide <= 1.9) {
-    // Claro corto: TODAS P-15
+  // Regla: ≤4m → P-15, 4-5m → P-20, >5m → P-25
+  if (shortestSide <= 4) {
+    // Claro corto (hasta 4m): TODAS P-15
     return { p15: totalViguetas, p20: 0, p25: 0 };
   } else if (shortestSide <= 5) {
-    // Claro medio (1.9m - 5m): TODAS P-20
+    // Claro medio (4m - 5m): TODAS P-20
     return { p15: 0, p20: totalViguetas, p25: 0 };
   } else {
     // Claro largo (>5m): TODAS P-25
