@@ -15,18 +15,39 @@ const COLORS = ['#f97316', '#0f172a', '#10b981', '#3b82f6', '#8b5cf6'];
 
 const technicalSpecs = [
   {
-    category: "Resistencia Estructural",
-    vigueta: "Peralte efectivo P-15, P-20, P-25 con acero de alta resistencia fy=6000 kg/cm²",
-    tradicional: "Peralte limitado por espesor de losa (10-15cm típico)",
+    category: "Uso de Agua",
+    vigueta: "30% menos consumo de agua en el proceso constructivo",
+    tradicional: "100% consumo base (curado y mezcla intensivo)",
     advantage: "vigueta",
-    detail: "Las viguetas pretensadas alcanzan claros de hasta 10m sin apoyos intermedios"
+    detail: "Apoyo al medio ambiente: menor huella hídrica gracias a prefabricación en planta"
+  },
+  {
+    category: "Cimbrado",
+    vigueta: "Solo 30% de cimbra (apoyos temporales puntuales)",
+    tradicional: "100% cimbra completa requerida (madera o metálica)",
+    advantage: "vigueta",
+    detail: "70% menos cimbrado = ahorro significativo en materiales y mano de obra"
   },
   {
     category: "Peso Propio",
-    vigueta: "180-220 kg/m² (incluyendo acabados)",
-    tradicional: "350-450 kg/m² (losa maciza de 15cm)",
+    vigueta: "168 kg/m² (30% más ligero)",
+    tradicional: "240 kg/m² (losa maciza de 10cm)",
     advantage: "vigueta",
-    detail: "Reducción del 45-55% en peso muerto significa menores costos en cimentación"
+    detail: "Reducción del 30% en peso muerto significa menores costos en cimentación"
+  },
+  {
+    category: "Resistencia Estructural",
+    vigueta: "Peralte efectivo P-15, P-20, P-25 con acero de alta resistencia fy=6000 kg/cm²",
+    tradicional: "Peralte limitado por espesor de losa (10cm típico)",
+    advantage: "vigueta",
+    detail: "Las viguetas pretensadas alcanzan claros de hasta 7m sin apoyos intermedios"
+  },
+  {
+    category: "Tiempo de Instalación",
+    vigueta: "50 m²/día por cuadrilla",
+    tradicional: "5 m²/día incluyendo armado y colado",
+    advantage: "vigueta",
+    detail: "Hasta 10 veces más rápido que sistemas tradicionales"
   },
   {
     category: "Aislamiento Térmico",
@@ -34,27 +55,6 @@ const technicalSpecs = [
     tradicional: "R-value 0.8-1.2 (concreto sólido)",
     advantage: "vigueta",
     detail: "Ahorro de 35-45% en climatización anual"
-  },
-  {
-    category: "Aislamiento Acústico",
-    vigueta: "STC 45-52 dB con tratamiento superficial",
-    tradicional: "STC 40-45 dB (losa maciza 15cm)",
-    advantage: "tradicional",
-    detail: "Se requiere tratamiento adicional para igualar rendimiento acústico"
-  },
-  {
-    category: "Tiempo de Instalación",
-    vigueta: "25-35 m²/día por cuadrilla de 4 personas",
-    tradicional: "8-12 m²/día incluyendo armado y colado",
-    advantage: "vigueta",
-    detail: "Hasta 3 veces más rápido que sistemas tradicionales"
-  },
-  {
-    category: "Cimbrado",
-    vigueta: "Mínimo: solo apoyos temporales puntuales",
-    tradicional: "Cimbra completa requerida (madera o metálica)",
-    advantage: "vigueta",
-    detail: "Eliminación del 80% del costo de cimbra"
   },
 ];
 
@@ -91,34 +91,34 @@ const myths = [
   },
   {
     myth: "Son más caras que las losas tradicionales",
-    reality: "El costo total (materiales + mano de obra + tiempo) es 15-25% menor. El ahorro en cimbra y tiempo de ejecución compensa el costo de materiales.",
+    reality: "El costo total V&B es 30% menor (70% del costo tradicional). Ahorro de 70% en cimbra, 30% menos agua, y ejecución 10x más rápida.",
     icon: DollarSign,
   },
   {
     myth: "No son adecuadas para zonas sísmicas",
-    reality: "Cumplen con NMX y NTC vigentes. Su menor peso reduce la demanda sísmica hasta 45%, mejorando el comportamiento estructural.",
+    reality: "Cumplen con NMX y NTC vigentes. Su menor peso (30% más ligero) reduce la demanda sísmica, mejorando el comportamiento estructural.",
     icon: Building2,
   },
   {
-    myth: "Se agrietan con facilidad",
-    reality: "El concreto pretensado previene agrietamiento bajo cargas de servicio. Las micro-fisuras del concreto tradicional son más comunes.",
-    icon: AlertTriangle,
+    myth: "Contamina el medio ambiente igual que lo tradicional",
+    reality: "30% menos uso de agua, 70% menos cimbrado. Trabajamos con empresas socialmente responsables validadas por ingenieros y arquitectos.",
+    icon: Leaf,
   },
 ];
 
 const benefits = [
   {
-    title: "Menor Impacto Ambiental",
-    description: "Reduce hasta 40% las emisiones de CO2 por menor uso de concreto y transporte optimizado",
+    title: "Apoyo al Medio Ambiente",
+    description: "30% menos uso de agua y 70% menos cimbrado. Empresas socialmente responsables validadas por ingenieros y arquitectos",
     icon: Leaf,
-    stat: "-40%",
+    stat: "-30%",
     color: "text-green-500",
   },
   {
-    title: "Ejecución Más Rápida",
-    description: "Acelera la obra en 50% permitiendo entregas anticipadas y menores costos financieros",
+    title: "Ejecución 10x Más Rápida",
+    description: "50 m²/día vs 5 m²/día tradicional. Entregas anticipadas y menores costos financieros",
     icon: Timer,
-    stat: "2x",
+    stat: "10x",
     color: "text-blue-500",
   },
   {
@@ -129,10 +129,10 @@ const benefits = [
     color: "text-purple-500",
   },
   {
-    title: "Garantía Estructural",
-    description: "Fabricación controlada en planta asegura calidad consistente y documentable",
+    title: "Calidad Certificada",
+    description: "Fabricación en planta con empresas socialmente responsables validadas por ingenieros-arquitectos",
     icon: Award,
-    stat: "25 años",
+    stat: "Validado",
     color: "text-orange-500",
   },
 ];
@@ -317,35 +317,37 @@ export default function ComparativePage() {
 
                 <Card className="shadow-lg border-primary/10 bg-primary text-primary-foreground">
                   <CardHeader>
-                    <CardTitle className="text-white">Impacto Ambiental</CardTitle>
-                    <CardDescription className="text-primary-foreground/70">Huella de carbono reducida</CardDescription>
+                    <CardTitle className="text-white">Apoyo al Medio Ambiente</CardTitle>
+                    <CardDescription className="text-primary-foreground/70">Construcción sostenible</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-white/10 rounded-full">
+                        <Waves className="h-6 w-6 text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-3xl font-bold">30% <span className="text-sm font-normal text-primary-foreground/70">menos agua</span></p>
+                        <p className="text-sm text-primary-foreground/50">Ahorro hídrico significativo</p>
+                      </div>
+                    </div>
+                    
                     <div className="flex items-center gap-4">
                       <div className="p-3 bg-white/10 rounded-full">
                         <TrendingDown className="h-6 w-6 text-green-400" />
                       </div>
                       <div>
-                        <p className="text-3xl font-bold">12.5 <span className="text-sm font-normal text-primary-foreground/70">ton CO2</span></p>
-                        <p className="text-sm text-primary-foreground/50">Menos emisiones por obra</p>
+                        <p className="text-3xl font-bold">70% <span className="text-sm font-normal text-primary-foreground/70">menos cimbra</span></p>
+                        <p className="text-sm text-primary-foreground/50">Reducción de materiales</p>
                       </div>
                     </div>
                     
                     <div className="h-px bg-white/10" />
                     
-                    <div className="space-y-4">
+                    <div className="p-4 bg-white/5 rounded-xl border border-white/10">
                       <p className="text-sm leading-relaxed text-primary-foreground/80">
-                        El uso de poliestireno de alta densidad reduce drásticamente la transferencia térmica, disminuyendo el consumo de aire acondicionado hasta en un <strong className="text-white">40%</strong>.
+                        <strong className="text-accent">Empresas socialmente responsables</strong> validadas por ingenieros y arquitectos. 
+                        Construcción que cuida el planeta.
                       </p>
-                      <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-xs uppercase tracking-wider font-semibold opacity-70">Confort Térmico Estimado</span>
-                          <span className="text-accent font-bold">{averageThermal}%</span>
-                        </div>
-                        <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                          <div className="bg-accent h-full transition-all duration-1000" style={{ width: `${averageThermal}%` }} />
-                        </div>
-                      </div>
                     </div>
                   </CardContent>
                 </Card>

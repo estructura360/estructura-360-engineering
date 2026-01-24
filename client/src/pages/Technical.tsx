@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Ruler, Layers, ShieldCheck, Zap, ThermometerSun, Clock, Weight, CheckCircle2, ArrowDown, Hammer, Truck, HardHat, Wrench, Building, BookOpen, AlertCircle, Lightbulb, Package, Construction, Grid3X3 } from "lucide-react";
+import { Ruler, Layers, ShieldCheck, Zap, ThermometerSun, Clock, Weight, CheckCircle2, ArrowDown, Hammer, Truck, HardHat, Wrench, Building, BookOpen, AlertCircle, Lightbulb, Package, Construction, Grid3X3, Leaf } from "lucide-react";
 
 import constructionImage from "@assets/stock_images/modern_construction__77c2c1d4.jpg";
 import cimbradoTecnicoImg from "@assets/IMG_6379_1769205801594.jpeg";
@@ -12,8 +12,8 @@ import cimbradoTecnicoImg from "@assets/IMG_6379_1769205801594.jpeg";
 const beams = [
   { 
     name: "P-15", 
-    maxSpan: "3.50m", 
-    use: "Residencial ligero", 
+    maxSpan: "4.00m", 
+    use: "Residencial ligero (claro ≤4m)", 
     load: "250 kg/m²",
     height: "15 cm",
     applications: ["Casas unifamiliares", "Garajes techados", "Anexos y cuartos adicionales"],
@@ -21,8 +21,8 @@ const beams = [
   },
   { 
     name: "P-20", 
-    maxSpan: "5.50m", 
-    use: "Residencial medio / Oficinas", 
+    maxSpan: "5.00m", 
+    use: "Residencial medio (claro 4-5m)", 
     load: "350 kg/m²",
     height: "20 cm",
     applications: ["Vivienda de interés medio", "Oficinas pequeñas", "Comercios en planta alta"],
@@ -31,7 +31,7 @@ const beams = [
   { 
     name: "P-25", 
     maxSpan: "7.00m", 
-    use: "Comercial / Claros largos", 
+    use: "Comercial (claro >5m)", 
     load: "500 kg/m²",
     height: "25 cm",
     applications: ["Bodegas ligeras", "Salones de usos múltiples", "Espacios comerciales amplios"],
@@ -254,9 +254,9 @@ export default function TechnicalPage() {
                   <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
                     <Weight className="h-6 w-6 text-green-600" />
                   </div>
-                  <h3 className="font-bold mb-2">45% Más Ligero</h3>
+                  <h3 className="font-bold mb-2">30% Más Ligero</h3>
                   <p className="text-sm text-muted-foreground">
-                    Las bovedillas de poliestireno reducen drásticamente el peso de la losa, 
+                    Las bovedillas de poliestireno reducen el peso a 168 kg/m² vs 240 kg/m² tradicional, 
                     disminuyendo costos en cimentación y mejorando el comportamiento sísmico.
                   </p>
                 </div>
@@ -304,10 +304,11 @@ export default function TechnicalPage() {
                   <Lightbulb className="h-10 w-10 text-accent" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-primary mb-2">¿Sabías que...?</h3>
+                  <h3 className="text-xl font-bold text-primary mb-2">Apoyo al Medio Ambiente</h3>
                   <p className="text-muted-foreground">
-                    El sistema vigueta y bovedilla se utiliza en más del <strong className="text-accent">70% de las construcciones residenciales</strong> en 
-                    México y Latinoamérica. Es el método preferido por su balance entre costo, velocidad y desempeño estructural.
+                    El sistema V&B utiliza <strong className="text-accent">30% menos agua</strong> y <strong className="text-accent">70% menos cimbrado</strong> que la losa tradicional. 
+                    Trabajamos con <strong className="text-primary">empresas socialmente responsables validadas por ingenieros y arquitectos</strong>. 
+                    Es el método preferido por su balance entre costo, velocidad y sostenibilidad.
                   </p>
                 </div>
               </div>
@@ -544,6 +545,23 @@ export default function TechnicalPage() {
                   <p className="text-green-700 text-sm">
                     Después del curado de 7 días, la losa está lista para recibir instalaciones eléctricas, hidráulicas, 
                     y acabados finales como firmes, losetas o pisos laminados.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-primary text-primary-foreground">
+            <CardContent className="py-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-white/10 rounded-xl shrink-0">
+                  <Leaf className="h-6 w-6 text-green-400" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white mb-1">Apoyo al Medio Ambiente</h3>
+                  <p className="text-primary-foreground/80 text-sm">
+                    El sistema V&B utiliza <strong className="text-accent">30% menos agua</strong> y <strong className="text-accent">70% menos cimbrado</strong> que la losa tradicional. 
+                    Trabajamos con <strong className="text-white">empresas socialmente responsables validadas por ingenieros y arquitectos</strong>.
                   </p>
                 </div>
               </div>

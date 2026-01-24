@@ -11,10 +11,10 @@ import workerImage from "@assets/stock_images/professional_constru_4a783fb5.jpg"
 import houseImage from "@assets/stock_images/modern_house_constru_639f58c6.jpg";
 
 const stats = [
-  { value: "45%", label: "Menos peso estructural", icon: Weight },
-  { value: "50%", label: "Más rápido de construir", icon: Clock },
-  { value: "40%", label: "Ahorro en climatización", icon: Zap },
-  { value: "35%", label: "Menos concreto", icon: TrendingDown },
+  { value: "30%", label: "Menos uso de agua", icon: TrendingDown },
+  { value: "70%", label: "Menos cimbrado", icon: Weight },
+  { value: "30%", label: "Más ligero que tradicional", icon: Clock },
+  { value: "30%", label: "Ahorro en materiales", icon: Zap },
 ];
 
 const features = [
@@ -49,12 +49,12 @@ const features = [
 ];
 
 const benefits = [
+  "Empresas socialmente responsables validadas por ingenieros y arquitectos",
   "Cálculos validados por ingenieros estructuristas certificados",
   "Funciona offline en obra - sincroniza automáticamente con WiFi",
   "Bitácora fotográfica con GPS para documentación profesional",
   "Presupuestos en PDF listos para presentar a clientes",
-  "Comparativas visuales que facilitan la venta del sistema",
-  "Optimización automática de cortes para minimizar desperdicio",
+  "30% menos uso de agua y 70% menos cimbrado = apoyo al medio ambiente",
 ];
 
 export default function AboutPage() {
@@ -235,13 +235,13 @@ export default function AboutPage() {
                 <div className="p-2 bg-primary/10 rounded-lg">
                   <Target className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle>Nuestra Misión</CardTitle>
+                <CardTitle>Nuestro Compromiso</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  Digitalizar y profesionalizar la industria de la construcción ligera, proporcionando 
-                  herramientas de cálculo precisas que permitan a constructores, maestros de obra y familias 
-                  tomar decisiones informadas, económicas y sostenibles.
+                  Trabajar exclusivamente con <strong className="text-primary">empresas socialmente responsables validadas por ingenieros y arquitectos</strong>. 
+                  Digitalizar la construcción ligera con herramientas que reducen el impacto ambiental: 
+                  <strong className="text-accent"> 30% menos uso de agua</strong> y <strong className="text-accent">70% menos cimbrado</strong> que la losa tradicional.
                 </p>
               </CardContent>
             </Card>
@@ -251,12 +251,12 @@ export default function AboutPage() {
                 <div className="p-2 bg-accent/10 rounded-lg">
                   <Award className="h-6 w-6 text-accent" />
                 </div>
-                <CardTitle>Nuestra Visión</CardTitle>
+                <CardTitle>Nuestra Meta</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  Ser la plataforma líder en el sector Construtech, impulsando un estándar de edificación 
-                  que priorice la seguridad estructural, el ahorro energético y la reducción de costos 
+                  Ser la plataforma líder en el sector Construtech, impulsando construcción sostenible 
+                  que cuide el medio ambiente, priorice la seguridad estructural y reduzca costos 
                   en vivienda para toda Latinoamérica.
                 </p>
               </CardContent>
@@ -309,10 +309,10 @@ export default function AboutPage() {
             <div className="flex gap-4 p-5 rounded-2xl bg-gradient-to-br from-green-50 to-green-100/50 border border-green-200">
               <Leaf className="h-8 w-8 text-green-600 shrink-0" />
               <div>
-                <h3 className="font-bold text-primary mb-1">Construcción Sostenible</h3>
+                <h3 className="font-bold text-primary mb-1">Apoyo al Medio Ambiente</h3>
                 <p className="text-sm text-muted-foreground">
-                  Al optimizar el uso de concreto y acero, reducimos directamente la huella hídrica 
-                  y de carbono. Cada metro cuadrado con vigueta y bovedilla es un paso hacia la sostenibilidad.
+                  El sistema V&B utiliza <strong className="text-green-700">30% menos agua</strong> y <strong className="text-green-700">70% menos cimbrado</strong> que la losa tradicional. 
+                  Trabajamos con empresas socialmente responsables validadas por ingenieros y arquitectos.
                 </p>
               </div>
             </div>
