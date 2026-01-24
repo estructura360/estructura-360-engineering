@@ -86,8 +86,9 @@ const COEFFICIENTS = {
   traditionalThickness: 0.10,  // 10cm losa tradicional
   vbCompressionLayer: 0.07,    // 7cm capa de compresión V&B
   vbSavingsFactor: 0.70,       // 30% ahorro de concreto
-  traditionalWeight: 288,
-  vbWeight: 180,
+  concreteWeight: 2400,        // kg/m³ peso del concreto
+  traditionalWeight: 240,      // 0.10m × 2400 kg/m³ = 240 kg/m²
+  vbWeight: 168,               // 30% más ligera: 240 × 0.70 = 168 kg/m²
   timeReduction: 0.65,         // 60-70% ahorro de tiempo
   formworkSavings: 0.85,       // 85% ahorro de cimbra
   productivityVB: 50,          // m²/día con V&B
