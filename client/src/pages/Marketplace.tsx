@@ -24,63 +24,13 @@ interface Provider {
 const providers: Provider[] = [
   { 
     id: 1,
-    name: "Planta Vigueta Central", 
-    city: "Ciudad de México", 
-    address: "Av. Insurgentes Sur 1234, Col. Del Valle",
-    phone: "+52 55 5123 4567",
-    lat: 19.3910,
-    lng: -99.1768,
-    schedule: { weekdays: "7:00 - 18:00", saturday: "8:00 - 14:00", sunday: "Cerrado" }
-  },
-  { 
-    id: 2,
-    name: "Paneles del Norte", 
-    city: "Monterrey", 
-    address: "Blvd. Díaz Ordaz 5678, Col. Santa María",
-    phone: "+52 81 8234 5678",
-    lat: 25.6866,
-    lng: -100.3161,
-    schedule: { weekdays: "6:30 - 17:30", saturday: "7:00 - 13:00", sunday: "Cerrado" }
-  },
-  { 
-    id: 3,
-    name: "Sistemas Constructivos GDL", 
-    city: "Guadalajara", 
-    address: "Calz. Lázaro Cárdenas 910, Zona Industrial",
-    phone: "+52 33 3345 6789",
-    lat: 20.6597,
-    lng: -103.3496,
-    schedule: { weekdays: "7:00 - 18:00", saturday: "8:00 - 15:00", sunday: "Cerrado" }
-  },
-  { 
-    id: 4,
-    name: "Materiales Ligeros del Sureste", 
-    city: "Mérida", 
-    address: "Calle 60 No. 456, Centro Histórico",
-    phone: "+52 99 9456 7890",
-    lat: 20.9674,
-    lng: -89.5926,
-    schedule: { weekdays: "7:30 - 17:00", saturday: "8:00 - 13:00", sunday: "Cerrado" }
-  },
-  { 
-    id: 5,
-    name: "Viguetas y Bovedillas Puebla", 
-    city: "Puebla", 
-    address: "Blvd. Atlixcáyotl 2345, Reserva Territorial",
-    phone: "+52 22 2567 8901",
-    lat: 19.0414,
-    lng: -98.2063,
-    schedule: { weekdays: "7:00 - 18:00", saturday: "8:00 - 14:00", sunday: "Cerrado" }
-  },
-  { 
-    id: 6,
-    name: "Estructuras Ligeras Tijuana", 
-    city: "Tijuana", 
-    address: "Blvd. Agua Caliente 7890, Zona Río",
-    phone: "+52 66 4678 9012",
-    lat: 32.5149,
-    lng: -117.0382,
-    schedule: { weekdays: "6:00 - 17:00", saturday: "7:00 - 12:00", sunday: "Cerrado" }
+    name: "VIGUETAS PREFABRICADAS VIGAPRE, SA DE CV", 
+    city: "México", 
+    address: "Consultar dirección exacta al contactar",
+    phone: "+52 55 1234 5678",
+    lat: 19.4326,
+    lng: -99.1332,
+    schedule: { weekdays: "8:00 - 18:00", saturday: "8:00 - 14:00", sunday: "Cerrado" }
   },
 ];
 
