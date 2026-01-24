@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { MapPin, Search, Phone, Factory, Clock, Navigation, Loader2, CheckCircle2, XCircle, Globe } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+import vigapreLogo from "@assets/3210249A-4677-4229-836B-63E07BDAFFDC_1769279131999.png";
+
 interface Provider {
   id: number;
   name: string;
@@ -13,6 +15,7 @@ interface Provider {
   address: string;
   phone: string;
   website?: string;
+  logo?: string;
   lat: number;
   lng: number;
   schedule: {
@@ -30,6 +33,7 @@ const providers: Provider[] = [
     address: "Av. Principal S/N El Esclavo, 54440 México, Méx.",
     phone: "55 2210 4104",
     website: "vigapre.com.mx",
+    logo: vigapreLogo,
     lat: 19.6850,
     lng: -99.2167,
     schedule: { weekdays: "8:00 - 17:00", saturday: "Cerrado", sunday: "Cerrado" }
@@ -202,8 +206,12 @@ export default function MarketplacePage() {
             return (
               <Card key={provider.id} className="hover-elevate transition-all duration-300 border-primary/10">
                 <CardHeader className="flex flex-row items-start gap-4 pb-2">
-                  <div className="p-3 bg-primary/5 rounded-xl shrink-0">
-                    <Factory className="h-6 w-6 text-primary" />
+                  <div className="p-2 bg-white rounded-xl shrink-0 border">
+                    {provider.logo ? (
+                      <img src={provider.logo} alt={provider.name} className="h-12 w-12 object-contain" />
+                    ) : (
+                      <Factory className="h-10 w-10 text-primary" />
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <CardTitle className="text-lg leading-tight">{provider.name}</CardTitle>
