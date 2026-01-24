@@ -3,7 +3,7 @@ import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MapPin, Search, Phone, Factory, Clock, Navigation, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { MapPin, Search, Phone, Factory, Clock, Navigation, Loader2, CheckCircle2, XCircle, Globe } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface Provider {
@@ -12,6 +12,7 @@ interface Provider {
   city: string;
   address: string;
   phone: string;
+  website?: string;
   lat: number;
   lng: number;
   schedule: {
@@ -25,12 +26,13 @@ const providers: Provider[] = [
   { 
     id: 1,
     name: "VIGUETAS PREFABRICADAS VIGAPRE, SA DE CV", 
-    city: "México", 
-    address: "Consultar dirección exacta al contactar",
-    phone: "+52 55 1234 5678",
-    lat: 19.4326,
-    lng: -99.1332,
-    schedule: { weekdays: "8:00 - 18:00", saturday: "8:00 - 14:00", sunday: "Cerrado" }
+    city: "Estado de México", 
+    address: "Av. Principal S/N El Esclavo, 54440 México, Méx.",
+    phone: "55 2210 4104",
+    website: "vigapre.com.mx",
+    lat: 19.6850,
+    lng: -99.2167,
+    schedule: { weekdays: "8:00 - 17:00", saturday: "Cerrado", sunday: "Cerrado" }
   },
 ];
 
@@ -247,16 +249,30 @@ export default function MarketplacePage() {
                     </div>
                   </div>
                   
-                  <Button 
-                    variant="default" 
-                    size="lg" 
-                    className="w-full bg-accent hover:bg-accent/90"
-                    onClick={() => window.open(`tel:${provider.phone.replace(/\s/g, '')}`, '_self')}
-                    data-testid={`button-call-${provider.id}`}
-                  >
-                    <Phone className="mr-2 h-4 w-4" />
-                    Llamar: {provider.phone}
-                  </Button>
+                  <div className="grid grid-cols-1 gap-3">
+                    <Button 
+                      variant="default" 
+                      size="lg" 
+                      className="w-full bg-accent hover:bg-accent/90"
+                      onClick={() => window.open(`tel:${provider.phone.replace(/\s/g, '')}`, '_self')}
+                      data-testid={`button-call-${provider.id}`}
+                    >
+                      <Phone className="mr-2 h-4 w-4" />
+                      Llamar: {provider.phone}
+                    </Button>
+                    {provider.website && (
+                      <Button 
+                        variant="outline" 
+                        size="lg" 
+                        className="w-full"
+                        onClick={() => window.open(`https://${provider.website}`, '_blank')}
+                        data-testid={`button-web-${provider.id}`}
+                      >
+                        <Globe className="mr-2 h-4 w-4" />
+                        Visitar sitio web
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             );
