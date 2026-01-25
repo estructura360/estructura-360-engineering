@@ -403,8 +403,9 @@ export default function BudgetPage() {
         doc.rect(offsetX + chainMargin, offsetY + chainMargin, drawWidth - chainMargin * 2, drawHeight - chainMargin * 2, 'F');
         
         // Draw viguetas (VERTICAL lines) with labels at top
-        const joistSpacing = 0.70; // 70cm standard
-        const numJoists = Math.floor((largo - 0.30) / joistSpacing);
+        // Use the joistCount from the layout calculation (consistent with stored data)
+        const numJoists = layout.joistCount;
+        const joistSpacing = (largo - 0.30) / numJoists; // Distribute evenly
         
         doc.setDrawColor(peralteColor.r, peralteColor.g, peralteColor.b);
         doc.setLineWidth(1.2);
