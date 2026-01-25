@@ -120,9 +120,7 @@ export default function BudgetPage() {
     doc.text("ESTRUCTURA 360", margin, 22);
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text("Soluciones en Construcción Ligera", margin, 30);
-    doc.setFontSize(8);
-    doc.text("Cálculos validados por ingenieros y arquitectos", margin, 38);
+    doc.text("Soluciones en Construccion Ligera", margin, 32);
     
     // Project info box
     doc.setFillColor(248, 250, 252);
@@ -133,7 +131,7 @@ export default function BudgetPage() {
     doc.setTextColor(15, 23, 42);
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.text("PRESUPUESTO FORMAL", margin + 5, 66);
+    doc.text("PRESUPUESTO", margin + 5, 66);
     
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
@@ -307,8 +305,8 @@ export default function BudgetPage() {
       
       slabItems.forEach((item, idx) => {
         const specs = item.specs as any;
-        const length = parseFloat(specs?.length) || 6;
-        const width = parseFloat(specs?.width) || 4;
+        const length = parseFloat(specs?.dimensions?.length) || parseFloat(specs?.length) || 6;
+        const width = parseFloat(specs?.dimensions?.width) || parseFloat(specs?.width) || 4;
         const layout = calculateLayout(length, width);
         
         const longestSide = Math.max(length, width);
