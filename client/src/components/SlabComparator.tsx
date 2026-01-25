@@ -199,14 +199,11 @@ export function SlabComparator() {
     const shortestSide = Math.min(length, width);
     const orientation = length >= width ? "length" : "width";
     
-    // Área útil para viguetas (descontando cadenas perimetrales)
-    const usableLength = longestSide - (chainWidth * 2);
-    
-    // Número de viguetas: dividir el área útil entre el espaciado estándar (0.70m)
-    const numJoists = Math.max(1, Math.floor(usableLength / BOVEDILLA.axisDistance));
+    // FÓRMULA CORRECTA - Viguetas: dividir lado corto entre 0.70, sin descontar cadenas
+    const numJoists = Math.max(1, Math.floor(shortestSide / BOVEDILLA.axisDistance));
     
     // Espaciado real entre viguetas para distribuir uniformemente
-    const joistSpacing = usableLength / (numJoists + 1);
+    const joistSpacing = (longestSide - chainWidth * 2) / (numJoists + 1);
     
     const joistPositions: { pos: number; peralte: 15 | 20 | 25 }[] = [];
     
@@ -238,6 +235,7 @@ export function SlabComparator() {
     const bovedillaRows: { y: number; pieces: { x: number; width: number; isAdjustment: boolean }[] }[] = [];
     
     // Crear filas de bovedillas entre cada par de viguetas y los bordes
+    // FÓRMULA CORRECTA - Bovedillas: longitud entre 1.22
     for (let i = 0; i <= numJoists; i++) {
       const rowStart = i === 0 ? chainWidth : joistPositions[i - 1].pos;
       const rowEnd = i === numJoists ? (longestSide - chainWidth) : joistPositions[i].pos;
@@ -248,10 +246,9 @@ export function SlabComparator() {
       
       const pieces: { x: number; width: number; isAdjustment: boolean }[] = [];
       const startX = chainWidth;
-      const availableLength = shortestSide - (chainWidth * 2);
-      
-      const fullPieces = Math.floor(availableLength / BOVEDILLA.length);
-      const remainder = availableLength - (fullPieces * BOVEDILLA.length);
+      // FÓRMULA CORRECTA: bovedillas = longitud / 1.22 (sin descontar cadenas)
+      const fullPieces = Math.floor(longestSide / BOVEDILLA.length);
+      const remainder = longestSide - (fullPieces * BOVEDILLA.length);
       
       for (let p = 0; p < fullPieces; p++) {
         pieces.push({

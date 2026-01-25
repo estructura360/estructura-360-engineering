@@ -56,8 +56,8 @@ export function calculateLayout(lengthInput: number, widthInput: number): Layout
   const shortestSide = Math.min(length, width);
   const orientation = length >= width ? 'horizontal' : 'vertical';
   
-  // Calculate number of viguetas: divide shortest side (claro) by 0.70, round DOWN
-  // No viguetas at edges (space for perimeter chain)
+  // FÓRMULA CORRECTA - Viguetas: dividir lado corto entre 0.70, redondear hacia abajo
+  // Sin descontar cadenas - fórmula directa
   const numJoists = Math.floor(shortestSide / BOVEDILLA.axisDistance);
   
   // Joist length is the shortest side (joists span across the shortest dimension)
@@ -94,10 +94,13 @@ export function calculateLayout(lengthInput: number, widthInput: number): Layout
     isEdge: i === 0 || i === numJoists - 1
   }));
   
-  // Calculate bovedillas - fill 100% of spaces between viguetas
+  // Calculate bovedillas - FÓRMULA CORRECTA: longitud entre 1.22
   const bovedillaRows: BovedillaRow[] = [];
   let totalBovedillas = 0;
   let adjustmentPieces = 0;
+  
+  // Número de bovedillas por fila = longitud / 1.22 (redondeado hacia arriba)
+  const bovedillasPerRow = Math.ceil(longestSide / BOVEDILLA.length);
   
   // Calculate bovedilla layout for each row (space between joists)
   for (let i = 0; i <= numJoists; i++) {
@@ -107,12 +110,11 @@ export function calculateLayout(lengthInput: number, widthInput: number): Layout
     
     if (rowWidth <= 0) continue;
     
-    // Calculate bovedilla pieces along the shortest side
+    // FÓRMULA CORRECTA: bovedillas = longitud / 1.22 (sin descontar cadenas)
     const pieces: { x: number; width: number; isAdjustment: boolean }[] = [];
-    const availableLength = shortestSide - (CHAIN_WIDTH * 2);
     
-    const fullPieces = Math.floor(availableLength / BOVEDILLA.length);
-    const remainder = availableLength - (fullPieces * BOVEDILLA.length);
+    const fullPieces = Math.floor(longestSide / BOVEDILLA.length);
+    const remainder = longestSide - (fullPieces * BOVEDILLA.length);
     
     let currentX = CHAIN_WIDTH;
     
@@ -142,11 +144,10 @@ export function calculateLayout(lengthInput: number, widthInput: number): Layout
     totalBovedillas += pieces.length;
   }
   
-  // Calculate vaults per bay (for display purposes)
-  const availableLength = shortestSide - (CHAIN_WIDTH * 2);
-  const fullPiecesPerBay = Math.floor(availableLength / BOVEDILLA.length);
-  const remainder = availableLength - (fullPiecesPerBay * BOVEDILLA.length);
-  const vaultsPerBay = fullPiecesPerBay + (remainder > 0.01 ? 1 : 0);
+  // FÓRMULA CORRECTA: bovedillas por bahía = longitud / 1.22 (sin descontar cadenas)
+  const fullPiecesPerBay = Math.floor(longestSide / BOVEDILLA.length);
+  const remainderBay = longestSide - (fullPiecesPerBay * BOVEDILLA.length);
+  const vaultsPerBay = fullPiecesPerBay + (remainderBay > 0.01 ? 1 : 0);
   
   // Calculate waste
   const totalMaterial = selectedBeamLength * piecesPerJoist * numJoists;
