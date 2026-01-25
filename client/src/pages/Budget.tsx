@@ -12,6 +12,7 @@ import { api } from "@shared/routes";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { calculateLayout } from "@/lib/layoutPlanner";
+import logoImg from "../assets/logo-estructura360.png";
 
 export default function BudgetPage() {
   const { data: projects, isLoading: isLoadingProjects } = useProjects();
@@ -91,7 +92,7 @@ export default function BudgetPage() {
     updateProject.mutate({ id: parseInt(selectedProjectId), laborCostPerM2: value });
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (!projectDetails) return;
     if (budgetItems.length === 0) {
       toast({
@@ -106,123 +107,143 @@ export default function BudgetPage() {
     const pageWidth = 210;
     const margin = 15;
     
-    // ====== PAGE 1: PRESUPUESTO ======
+    // Load logo image
+    const loadImage = (src: string): Promise<HTMLImageElement> => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    };
     
-    // Header with gradient effect
-    doc.setFillColor(15, 23, 42);
-    doc.rect(0, 0, pageWidth, 45, 'F');
-    doc.setFillColor(249, 115, 22);
-    doc.rect(0, 45, pageWidth, 3, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.setFont("helvetica", "bold");
-    doc.text("ESTRUCTURA 360", margin, 22);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text("Soluciones en Construccion Ligera", margin, 32);
-    
-    // Project info box
-    doc.setFillColor(248, 250, 252);
-    doc.roundedRect(margin, 55, pageWidth - margin * 2, 28, 3, 3, 'F');
-    doc.setDrawColor(226, 232, 240);
-    doc.roundedRect(margin, 55, pageWidth - margin * 2, 28, 3, 3, 'S');
-    
-    doc.setTextColor(15, 23, 42);
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("PRESUPUESTO", margin + 5, 66);
-    
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Cliente: ${projectDetails.clientName}`, margin + 5, 74);
-    doc.text(`Fecha: ${new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}`, margin + 80, 74);
-    doc.text(`Folio: #E360-${projectDetails.id}-${new Date().getFullYear()}`, margin + 5, 80);
-    
-    // Materials section header
-    doc.setFillColor(15, 23, 42);
-    doc.rect(margin, 90, pageWidth - margin * 2, 8, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("DESGLOSE DE MATERIALES", margin + 3, 96);
-
-    // Build table data
-    const tableData: string[][] = [];
-    
-    budgetItems.forEach(item => {
-      const area = parseFloat(item.area) || 0;
-      const unitPrice = area > 0 ? item.baseCost / area : 0;
+    try {
+      const logo = await loadImage(logoImg);
       
-      if (item.type === 'slab') {
-        tableData.push([
-          'LOSA VIGUETA Y BOVEDILLA',
-          `${area.toFixed(2)} m²`,
-          `$${unitPrice.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
-          `$${item.baseCost.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
-        ]);
+      // ====== PAGE 1: PRESUPUESTO ======
+      
+      // Header with logo
+      doc.setFillColor(255, 255, 255);
+      doc.rect(0, 0, pageWidth, 35, 'F');
+      doc.setFillColor(249, 115, 22);
+      doc.rect(0, 35, pageWidth, 2, 'F');
+      
+      // Add logo
+      doc.addImage(logo, 'PNG', margin, 5, 80, 25);
+      
+      // Date on the right
+      doc.setTextColor(100, 116, 139);
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Fecha: ${new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}`, pageWidth - margin, 15, { align: 'right' });
+      doc.text(`Folio: #E360-${projectDetails.id}-${new Date().getFullYear()}`, pageWidth - margin, 22, { align: 'right' });
+      
+      // Project info box
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(margin, 42, pageWidth - margin * 2, 20, 3, 3, 'F');
+      doc.setDrawColor(226, 232, 240);
+      doc.roundedRect(margin, 42, pageWidth - margin * 2, 20, 3, 3, 'S');
+      
+      doc.setTextColor(15, 23, 42);
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("PRESUPUESTO", margin + 5, 52);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Cliente: ${projectDetails.clientName}`, margin + 5, 58);
+      
+      // Materials section header
+      doc.setFillColor(15, 23, 42);
+      doc.rect(margin, 68, pageWidth - margin * 2, 8, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.text("DESGLOSE DE MATERIALES", margin + 3, 74);
+
+      // Build table data with correct specs
+      const tableData: string[][] = [];
+      
+      budgetItems.forEach(item => {
+        const area = parseFloat(item.area) || 0;
+        const specs = item.specs as any;
+        const unitPrice = area > 0 ? item.baseCost / area : 0;
         
-        if (item.viguetaCount > 0) {
+        if (item.type === 'slab') {
+          const viguetaType = specs?.viguetaTypeLabel || specs?.viguetaType || 'Vigueta';
+          const density = specs?.polystyreneDensity || 10;
+          const viguetaPrice = specs?.prices?.vigueta || 0;
+          const bovedillaPrice = specs?.prices?.bovedilla || 0;
+          const dimensions = specs?.dimensions;
+          const dimText = dimensions ? `${dimensions.length}m × ${dimensions.width}m` : '';
+          
           tableData.push([
-            '    Viguetas pretensadas',
-            `${item.viguetaCount} pzas`,
-            '',
-            `$${item.viguetaCost.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
+            `LOSA VIGUETA Y BOVEDILLA ${dimText}`,
+            `${area.toFixed(2)} m²`,
+            `$${unitPrice.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
+            `$${item.baseCost.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
+          ]);
+          
+          if (item.viguetaCount > 0) {
+            tableData.push([
+              `    ${viguetaType}`,
+              `${item.viguetaCount} pzas`,
+              `$${viguetaPrice.toLocaleString('es-MX', { minimumFractionDigits: 2 })} c/u`,
+              `$${item.viguetaCost.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
+            ]);
+          }
+          
+          if (item.bovedillaVolume > 0) {
+            tableData.push([
+              `    Bovedilla EPS ${density} kg/m³`,
+              `${item.bovedillaVolume.toFixed(2)} m³`,
+              `$${bovedillaPrice.toLocaleString('es-MX', { minimumFractionDigits: 2 })}/m³`,
+              `$${item.bovedillaCost.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
+            ]);
+          }
+        } else if (item.type === 'wall') {
+          tableData.push([
+            'MURO PANEL ESTRUCTURAL',
+            `${area.toFixed(2)} m²`,
+            `$${unitPrice.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
+            `$${item.baseCost.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
           ]);
         }
-        
-        if (item.bovedillaVolume > 0) {
-          tableData.push([
-            '    Bovedilla EPS (1.22×0.63×0.12m)',
-            `${item.bovedillaVolume.toFixed(2)} m³`,
-            '',
-            `$${item.bovedillaCost.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
-          ]);
-        }
-      } else if (item.type === 'wall') {
+      });
+
+      if (totalLaborCost > 0) {
         tableData.push([
-          'MURO PANEL ESTRUCTURAL',
-          `${area.toFixed(2)} m²`,
-          `$${unitPrice.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
-          `$${item.baseCost.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
+          'MANO DE OBRA',
+          `${totalArea.toFixed(2)} m²`,
+          `$${parseFloat(projectDetails?.laborCostPerM2 || "0").toLocaleString('es-MX', { minimumFractionDigits: 2 })}/m²`,
+          `$${totalLaborCost.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
         ]);
       }
-    });
 
-    if (totalLaborCost > 0) {
-      tableData.push([
-        'MANO DE OBRA',
-        `${totalArea.toFixed(2)} m²`,
-        `$${parseFloat(projectDetails?.laborCostPerM2 || "0").toLocaleString('es-MX', { minimumFractionDigits: 2 })}/m²`,
-        `$${totalLaborCost.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
-      ]);
-    }
+      autoTable(doc, {
+        startY: 78,
+        head: [['Concepto', 'Cantidad', 'P. Unitario', 'Importe']],
+        body: tableData,
+        headStyles: { 
+          fillColor: [241, 245, 249],
+          textColor: [15, 23, 42],
+          fontStyle: 'bold',
+          fontSize: 9
+        },
+        bodyStyles: { fontSize: 9 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+        columnStyles: {
+          0: { cellWidth: 80 },
+          1: { cellWidth: 35, halign: 'center' },
+          2: { cellWidth: 35, halign: 'right' },
+          3: { cellWidth: 35, halign: 'right' }
+        },
+        margin: { left: margin, right: margin },
+        didDrawPage: (data) => {
+          (doc as any).lastTableFinalY = data.cursor?.y;
+        }
+      });
 
-    autoTable(doc, {
-      startY: 100,
-      head: [['Concepto', 'Cantidad', 'P. Unitario', 'Importe']],
-      body: tableData,
-      headStyles: { 
-        fillColor: [241, 245, 249],
-        textColor: [15, 23, 42],
-        fontStyle: 'bold',
-        fontSize: 9
-      },
-      bodyStyles: { fontSize: 9 },
-      alternateRowStyles: { fillColor: [248, 250, 252] },
-      columnStyles: {
-        0: { cellWidth: 80 },
-        1: { cellWidth: 35, halign: 'center' },
-        2: { cellWidth: 35, halign: 'right' },
-        3: { cellWidth: 35, halign: 'right' }
-      },
-      margin: { left: margin, right: margin },
-      didDrawPage: (data) => {
-        (doc as any).lastTableFinalY = data.cursor?.y;
-      }
-    });
-
-    const finalY = (doc as any).lastTableFinalY || 160;
+      const finalY = (doc as any).lastTableFinalY || 140;
 
     // Summary box
     doc.setFillColor(248, 250, 252);
@@ -312,6 +333,10 @@ export default function BudgetPage() {
         const longestSide = Math.max(length, width);
         const shortestSide = Math.min(length, width);
         
+        // Get vigueta type and density from specs
+        const viguetaType = specs?.viguetaTypeLabel || specs?.viguetaType || 'Vigueta';
+        const density = specs?.polystyreneDensity || 10;
+        
         // Get peralte based on shortest side
         let peralte = 15;
         let peralteColor = { r: 34, g: 211, b: 238 }; // cyan
@@ -327,15 +352,18 @@ export default function BudgetPage() {
         doc.setTextColor(15, 23, 42);
         doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
-        doc.text(`Losa ${idx + 1}: ${length.toFixed(2)}m × ${width.toFixed(2)}m = ${(length * width).toFixed(2)} m²`, margin, planoY);
+        doc.text(`Losa ${idx + 1}: ${length.toFixed(2)}m x ${width.toFixed(2)}m = ${(length * width).toFixed(2)} m²`, margin, planoY);
         
-        planoY += 8;
+        planoY += 7;
         
-        // Technical specs
+        // Technical specs - show vigueta type and density
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(100, 116, 139);
-        doc.text(`Peralte: P-${peralte} | Viguetas: ${layout.joistCount} pzas | Bovedillas: ${layout.totalVaults} pzas`, margin, planoY);
+        doc.text(`${viguetaType} | Bovedilla EPS ${density} kg/m³ | Peralte P-${peralte}`, margin, planoY);
+        
+        planoY += 6;
+        doc.text(`Viguetas: ${layout.joistCount} pzas | Bovedillas: ${layout.totalVaults} pzas`, margin, planoY);
         
         planoY += 10;
         
@@ -482,10 +510,18 @@ export default function BudgetPage() {
     link.click();
     document.body.removeChild(link);
     
-    toast({
-      title: "PDF Generado",
-      description: "El presupuesto con plano de distribución se abrió en una nueva pestaña.",
-    });
+      toast({
+        title: "PDF Generado",
+        description: "El presupuesto con plano de distribución se abrió en una nueva pestaña.",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo generar el PDF. Intenta de nuevo.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleShareWhatsApp = () => {
