@@ -1,0 +1,102 @@
+1. Tipos de vigueta según peralte y claro máximo
+•	Vigueta peralte 15 → claro máximo 4.00 m
+•	Vigueta peralte 20 → claro máximo 5.00 m
+•	Vigueta peralte 25 → claro máximo 10.00 m
+Si el claro efectivo entre apoyos excede 10 m, la app automáticamente:
+•	Divide el claro en tramos ≤10 m
+•	Calcula apoyos intermedios (columna, muro o trabe)
+•	Ajusta planos y presupuestos
+El peralte se basa en el lado más corto del claro efectivo.
+2. Cálculo de viguetas
+•	Separación entre viguetas: 0.70 m
+•	Cantidad = (lado más largo del área ÷ 0.70)
+→ Redondear al entero más cercano
+→ Agregar 2% de desperdicio
+Largo de cada vigueta = lado más corto del claro efectivo.
+3. Bovedillas
+Las bovedillas deben cumplir:
+•	Peralte = peralte de la vigueta seleccionada
+•	Dimensiones:
+o	1.22 × 0.63 × 0.15 m (peralte 15)
+o	1.22 × 0.63 × 0.20 m (peralte 20)
+o	1.22 × 0.63 × 0.25 m (peralte 25)
+Cálculo:
+•	Largo de la vigueta ÷ 1.22
+→ Redondear al entero superior
+→ Multiplicar por número de viguetas
+→ Agregar 2% de desperdicio
+Volumen = largo × ancho × peralte × total de bovedillas
+La bovedilla es de EPS con densidad fija de 8 kg/m³.
+🪚 B. MALLA ELECTROSOLDADA PARA LOSAS
+•	Tipo: 6×6 – 10/10
+•	Calcular por m² de losa
+•	Cantidad = área total de losa
+→ Agregar 2% de desperdicio
+→ Considerar traslapes y ensambles
+La malla debe reflejarse en:
+•	Cantidades
+•	Comparativas
+•	Costos en presupuesto
+🧱 C. PANEL ESTRUCTURAL
+•	Densidad ajustable entre 14 y 16 kg/m³
+•	Cada panel reforzado con:
+o	2 mallas electrosoldadas calibre 14
+•	Medidas estándar:
+o	1.22 m x 2.44 m
+•	Espesores disponibles:
+o	2’’ / 3’’ / 4’’ / 5’’
+•	Longitudes especiales hasta 5.00 m
+•	Calcular paneles según área de muro
+→ Agregar 2% de desperdicio
+📘 D. INFORMACIÓN TÉCNICA (Pestaña)
+¿Qué es el sistema Vigueta y Bovedilla?
+•	Sistema prefabricado de losas compuesto por viguetas pretensadas y bovedillas entre ellas.
+•	Capa de compresión con concreto fc250 (28 días) por encima de elementos prefabricados. 
+Características principales
+✔ Aislante térmico y acústico:
+La presencia de cámaras de aire y aligerantes reduce la transmisión de calor y ruido interior. 
+✔ Estrutura superior ligera:
+El peso muerto de la losa es menor comparado con losas tradicionales, lo que reduce cargas sobre cimentaciones y elementos verticales. 
+✔ Rapidez de ejecución:
+Elementos prefabricados se ensamblan rápida y fácilmente, reduciendo tiempos de obra y permitiendo iniciar trabajos complementarios antes que en losas tradicionales. 
+✔ Ahorro estimado de material y costos:
+Hasta ~30% o más de ahorro en concreto, acero, cimbra y mano de obra frente a una losa maciza tradicional (valores de referencia de mercado). 
+✔ Beneficios estructurales:
+Prestressed viguetas mejoran resistencia a cargas y control de deflexiones comparadas con reforzadas en obra, con buen comportamiento ante cargas fc250. 
+✔ Integración de instalaciones:
+Las cámaras entre viguetas y bovedillas facilitan el paso de tuberías eléctricas, hidrosanitarias y servicios sin cortes extensivos a la losa.
+🧾 E. CATALOGO DE PRODUCTOS (Pestaña)
+La pestaña catálogo debe incluir:
+🔹 Viguetas pretensadas (peraltes 15, 20, 25)
+🔹 Bovedillas (dimensiones según peralte)
+🔹 Malla electrosoldada 6×6–10/10
+🔹 Panel estructural 1.22×2.44 (espesores 2’’–5’’)
+🔹 Especificaciones técnicas de cada producto
+🔹 Densidad, refuerzos, normas aplicables
+🔹 Unidad de medida y cálculo de desperdicio
+📊 F. COMPARATIVA (Pestaña)
+Incluir, entre otros:
+✔ Peso propio de los sistemas
+✔ Resistencia estructural y límites de claro
+✔ Tiempo de ejecución (comparativo con tradicional)
+✔ Aislamiento térmico y acústico
+✔ Mitología vs realidad del sistema
+✔ Impacto ambiental
+✔ Ahorros claros en materiales y mano de obra
+📣 G. ACERCA DE… (Convencer al usuario)
+Desarrollar contenido enfocado en:
+✔ Por qué elegir vigueta y bovedilla sobre losa tradicional
+✔ Ahorro de materiales, agua, energía y cimbra
+✔ Reducción de tiempo de obra
+✔ Mejor aislamiento térmico y acústico
+✔ Resistencia adecuada considerando fc250
+✔ Beneficios ambientales y sociales
+📏 H. CONSISTENCIA GLOBAL
+Todos los cálculos y textos deben ser coherentes y sincronizados en:
+✔ Panel Muro
+✔ Comparativa
+✔ Presupuesto
+✔ Información técnica
+✔ Catálogo
+✔ Acerca de…
+No debe haber discrepancias entre secciones para un mismo sistema constructivo.
