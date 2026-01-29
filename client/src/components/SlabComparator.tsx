@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Calculator, FileDown, Scale, Clock, Weight, TrendingDown, Users, Ruler, Info, CheckCircle2, Feather, Shield } from "lucide-react";
+import { Calculator, FileDown, Scale, Clock, Weight, TrendingDown, Users, Ruler, Info, CheckCircle2, Feather, Shield, Leaf } from "lucide-react";
+import { EnvironmentalBenefits } from "@/components/EnvironmentalBenefits";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import jsPDF from "jspdf";
@@ -1278,12 +1279,14 @@ export function SlabComparator() {
             </CardContent>
           </Card>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-8">
             <Button onClick={generatePDF} size="lg" className="gap-2" data-testid="button-generate-pdf">
               <FileDown className="h-5 w-5" />
               Generar Presupuesto PDF
             </Button>
           </div>
+
+          <EnvironmentalBenefits variant="compact" />
         </>
       )}
     </div>

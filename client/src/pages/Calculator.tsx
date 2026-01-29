@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { calculateLayout, calculatePanels, LayoutResult, MALLA_ELECTROSOLDADA, PANEL_ESTRUCTURAL } from "@/lib/layoutPlanner";
 import { SlabLayoutDiagram } from "@/components/SlabLayoutDiagram";
+import { EnvironmentalBenefits } from "@/components/EnvironmentalBenefits";
 
 // EPS density is FIXED at 8 kg/m³ per specifications
 const EPS_DENSITY_FIXED = 8;
@@ -1039,6 +1040,10 @@ export default function CalculatorPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <div className="mt-8">
+        <EnvironmentalBenefits variant="compact" />
+      </div>
     </Layout>
   );
 }

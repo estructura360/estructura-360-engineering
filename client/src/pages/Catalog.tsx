@@ -23,6 +23,7 @@ import {
   MALLA_ELECTROSOLDADA, 
   PANEL_ESTRUCTURAL 
 } from "@/lib/layoutPlanner";
+import { EnvironmentalBenefits } from "@/components/EnvironmentalBenefits";
 
 interface ProductSpec {
   label: string;
@@ -486,6 +487,10 @@ export default function CatalogPage() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        <div className="mt-8">
+          <EnvironmentalBenefits variant="compact" />
+        </div>
 
         <div className="mt-8 flex justify-center gap-4">
           <Button onClick={() => setLocation("/")} data-testid="button-calculator">

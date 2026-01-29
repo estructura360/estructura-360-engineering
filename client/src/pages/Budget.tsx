@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Share2, Trash2, FileDown, Loader2, FileText } from "lucide-react";
+import { Share2, Trash2, FileDown, Loader2, FileText, Leaf } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@shared/routes";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { calculateLayout } from "@/lib/layoutPlanner";
 import logoImg from "../assets/logo-estructura360.png";
+import { EnvironmentalBenefits } from "@/components/EnvironmentalBenefits";
 
 export default function BudgetPage() {
   const { data: projects, isLoading: isLoadingProjects } = useProjects();
@@ -659,6 +660,7 @@ _Generado por Estructura 360 Engineering_
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
+        <>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <Card className="lg:col-span-2 border-0 shadow-lg">
             <CardHeader>
@@ -818,6 +820,11 @@ _Generado por Estructura 360 Engineering_
             </Card>
           </div>
         </div>
+
+        <div className="mt-8">
+          <EnvironmentalBenefits variant="mini" maxItems={8} />
+        </div>
+        </>
       )}
     </Layout>
   );

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { Info, Target, Zap, Shield, Heart, Leaf, ArrowRight, CheckCircle2, TrendingDown, Clock, Weight, Building, Users, Award, Calculator, FileText, BarChart3, Calendar } from "lucide-react";
+import { EnvironmentalBenefits } from "@/components/EnvironmentalBenefits";
 
 import heroImage from "@assets/stock_images/civil_engineers_cons_5bf37a62.jpg";
 import blueprintImage from "@assets/stock_images/construction_enginee_10031660.jpg";
@@ -317,6 +318,10 @@ export default function AboutPage() {
               </div>
             </div>
           </div>
+        </section>
+
+        <section className="max-w-6xl mx-auto" id="environmental-benefits">
+          <EnvironmentalBenefits variant="full" showTitle={true} />
         </section>
 
         <section className="bg-gradient-to-r from-primary to-primary/90 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-12">

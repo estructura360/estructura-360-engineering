@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Ruler, Layers, ShieldCheck, Zap, ThermometerSun, Clock, Weight, CheckCircle2, ArrowDown, Hammer, Truck, HardHat, Wrench, Building, BookOpen, AlertCircle, Lightbulb, Package, Construction, Grid3X3, Leaf } from "lucide-react";
+import { EnvironmentalBenefits } from "@/components/EnvironmentalBenefits";
 
 import constructionImage from "@assets/stock_images/modern_construction__77c2c1d4.jpg";
 import cimbradoTecnicoImg from "@assets/IMG_6379_1769205801594.jpeg";
@@ -925,6 +926,10 @@ export default function TechnicalPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      <div className="mt-8">
+        <EnvironmentalBenefits variant="full" showTitle={true} />
+      </div>
     </Layout>
   );
 }
