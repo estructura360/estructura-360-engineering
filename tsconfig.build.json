@@ -1,10 +1,5 @@
 {
   "extends": "./tsconfig.json",
   "include": ["server/**/*", "shared/**/*"],
-  "exclude": [
-    "node_modules",
-    "client",
-    "vite.config.ts",
-    "server/vite.dev.ts"
-  ]
+  "exclude": ["node_modules", "client"]
 }
