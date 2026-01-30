@@ -5,7 +5,7 @@
     "client",
     "dist",
     "vite.config.ts",
-    "server/vite.ts"
+    "server/vite.dev.ts"
   ],
   "compilerOptions": {
     "outDir": "dist",
