@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { insertProjectSchema, insertCalculationSchema, projects, calculations, InsertProject, InsertCalculation, Project, Calculation } from './schema';
+import { insertProjectSchema, insertCalculationSchema, projects, calculations, InsertProject, InsertCalculation, Project, Calculation } from '../shared/schema.js';
 
 export type CreateProjectRequest = InsertProject;
 export type AddCalculationRequest = InsertCalculation;

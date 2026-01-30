@@ -11,8 +11,8 @@ import {
   type InsertTask,
   type ConstructionLog,
   type InsertLog,
-} from "@shared/schema";
-import { db } from "./db";
+} from "../shared/schema.js";
+import { db } from "./db.js";
 import { eq } from "drizzle-orm";
 
 export interface IStorage {
@@ -42,9 +42,15 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   // Projects
   async createProject(project: InsertProject): Promise<Project> {
-    const [newProject] = await db.insert(projects).values(project).returning();
-    return newProject;
-  }
+  const [newProject] = await db
+    .insert(projects)
+    .values({
+      clientName: project.clientName,
+    })
+    .returning();
+
+  return newProject;
+}
 
   async getProject(id: number): Promise<Project | undefined> {
     const [project] = await db.select().from(projects).where(eq(projects.id, id));
@@ -73,7 +79,17 @@ export class DatabaseStorage implements IStorage {
 
   // Calculations
   async createCalculation(calculation: InsertCalculation): Promise<Calculation> {
-    const [newCalc] = await db.insert(calculations).values(calculation).returning();
+    const [newCalc] = await db
+  .insert(calculations)
+  .values({
+    projectId: calculation.projectId,
+    type: calculation.type,
+    area: calculation.area,
+    specs: calculation.specs,
+    results: calculation.results,
+  })
+  .returning();
+
     return newCalc;
   }
 
@@ -94,14 +110,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createTask(task: InsertTask): Promise<ScheduleTask> {
-    const taskWithDates = {
-      ...task,
-      startDate: typeof task.startDate === 'string' ? new Date(task.startDate) : task.startDate,
-      endDate: typeof task.endDate === 'string' ? new Date(task.endDate) : task.endDate,
-    };
-    const [newTask] = await db.insert(scheduleTasks).values(taskWithDates).returning();
-    return newTask;
-  }
+  const taskWithDates = {
+    projectId: task.projectId,
+    title: task.title,
+    startDate: typeof task.startDate === "string"
+      ? new Date(task.startDate)
+      : task.startDate,
+    endDate: typeof task.endDate === "string"
+      ? new Date(task.endDate)
+      : task.endDate,
+  };
+
+  const [newTask] = await db
+    .insert(scheduleTasks)
+    .values(taskWithDates)
+    .returning();
+
+  return newTask;
+}   
 
   async updateTask(id: number, task: Partial<InsertTask>): Promise<ScheduleTask> {
     const taskWithDates = {

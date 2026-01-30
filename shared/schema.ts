@@ -1,7 +1,43 @@
 import { pgTable, text, serial, integer, boolean, timestamp, jsonb, decimal } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+// ===============================
+// INSERT SCHEMAS (ZOD MANUAL)
+// ===============================
+
+export const insertProjectSchema = z.object({
+  clientName: z.string().min(1),
+  profitMargin: z.string().optional(),
+  laborCostPerM2: z.string().optional(),
+});
+
+export const insertCalculationSchema = z.object({
+  projectId: z.number(),
+  type: z.string(),
+  area: z.string(),
+  specs: z.unknown(),
+  results: z.unknown(),
+});
+
+export const insertTaskSchema = z.object({
+  projectId: z.number(),
+  title: z.string(),
+  startDate: z.union([z.string(), z.date()]),
+  endDate: z.union([z.string(), z.date()]),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
+  priority: z.string().optional(),
+  dependencies: z.array(z.number()).optional(),
+  status: z.string().optional(),
+});
+
+export const insertLogSchema = z.object({
+  projectId: z.number(),
+  notes: z.string().optional(),
+  photoUrl: z.string().optional(),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
+});
 
 // === TABLE DEFINITIONS ===
 
@@ -72,12 +108,6 @@ export const constructionLogsRelations = relations(constructionLogs, ({ one }) =
     references: [projects.id],
   }),
 }));
-
-// === BASE SCHEMAS ===
-export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
-export const insertCalculationSchema = createInsertSchema(calculations).omit({ id: true });
-export const insertTaskSchema = createInsertSchema(scheduleTasks).omit({ id: true });
-export const insertLogSchema = createInsertSchema(constructionLogs).omit({ id: true, timestamp: true });
 
 // === EXPLICIT API CONTRACT TYPES ===
 export type Project = typeof projects.$inferSelect;
