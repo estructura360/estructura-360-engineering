@@ -1,6 +1,14 @@
 {
   "include": ["server/**/*", "shared/**/*"],
-  "exclude": ["node_modules", "client", "**/*.test.ts"],
+  "exclude": [
+    "node_modules",
+    "client",
+    "dist",
+    "vite.config.ts",
+    "server/vite.ts",
+    "**/*.test.ts"
+  ],
+
   "compilerOptions": {
     "outDir": "dist",
     "target": "ES2020",
@@ -10,7 +18,6 @@
 
     "strict": false,
     "noImplicitAny": false,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": false
+    "skipLibCheck": true
   }
 }
